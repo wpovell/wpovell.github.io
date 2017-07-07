@@ -148,7 +148,10 @@ def genAbout():
 		f.write(render_template('about.html'))
 
 def cleanDist():
-	dir_util.remove_tree(OUT_DIR)
+	try:
+		dir_util.remove_tree(OUT_DIR)
+	except FileNotFoundError:
+		pass
 
 def initDist():
 	dir_util.mkpath(f'{OUT_DIR}/posts')
