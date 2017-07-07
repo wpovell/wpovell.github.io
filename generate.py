@@ -168,7 +168,7 @@ clean = False
 def main():
 	if clean:
 		cleanDist()
-		initDist()
+	initDist()
 	posts = getPosts()
 	ops = [sot]
 	genIndex(posts)
