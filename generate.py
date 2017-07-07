@@ -6,8 +6,6 @@ from collections import Counter
 
 import ipynb
 
-HEADERS = ['title', 'tags', 'time', 'slug', 'ipython']
-
 class Post:
 	def __init__(self, fn):
 		with open(fn, encoding='utf-8') as f:
@@ -23,8 +21,7 @@ class Post:
 				tag, value = line.split(':', 1)
 				tag = tag.strip().lower()
 				value = value.strip()
-				if tag in HEADERS:
-					self.meta[tag] = value
+				self.meta[tag] = value
 			else:
 				self.body += line
 
@@ -65,8 +62,13 @@ class Post:
 	def processHeaders(self):
 		if 'tags' in self.meta:
 			self.meta['tags'] = [x.strip() for x in self.meta['tags'].split(',')]
+		else:
+			self.meta['tags'] = []
+
 		if 'time' in self.meta:
 			self.meta['time'] = datetime.strptime(self.meta['time'], '%y-%m-%d %I:%M%p')
+
+		self.hide = 'hide' in self.meta
 
 	def render(self):
 		body = self.body
@@ -85,11 +87,13 @@ class Post:
 def markdown(text):
 	return pypandoc.convert_text(text, 'html', format='md')
 
-def getPosts():
+def getPosts(hide):
 	posts = []
 	for post in os.listdir('posts'):
 		if post.endswith('.md'):
 			posts.append(Post(f'posts/{post}'))
+	if hide:
+		posts = list(filter(lambda p: not p.hide, posts))
 	posts.sort(key=lambda x: x.meta['time'], reverse=True)
 	return posts
 
@@ -164,12 +168,15 @@ def sot(post):
 
 POSTS_PER_PAGE = 5
 OUT_DIR = 'dist'
-clean = False
 def main():
-	if clean:
+	from sys import argv
+
+	hide = False
+	if 'deploy' in argv:
+		hide = True
 		cleanDist()
-	initDist()
-	posts = getPosts()
+		initDist()
+	posts = getPosts(hide)
 	ops = [sot]
 	genIndex(posts)
 	genAbout()
