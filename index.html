@@ -1,1 +1,320 @@
+<!DOCTYPE html>
 
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+    
+    <title>Blog</title>
+</head>
+
+<body>
+<div id='container' class='container-fluid'>
+    <div class="row">
+        <div id='sidebar' class="col-md-2">
+            
+                <h1>wpovell's blog</h1>
+            
+                <a href='/about.html' class='sd-link'>About</a>
+                <br/>
+                <a href='/tags/' class='sd-link'>Archive</a>
+                <br/>
+                <a href='/resume.pdf' class='sd-link'>Resume</a>
+                <br />
+                <a href='http://github.com/wpovell/'><i class="sd-link fa fa-github" aria-hidden="true"></i></a>
+                <a href='mailto:william_povell@brown.edu'><i class="sd-link fa fa-envelope" aria-hidden="true"></i></a>
+                <a href='https://www.linkedin.com/in/william-povell'><i class="sd-link fa fa-linkedin-square" aria-hidden="true"></i></a>
+        </div>
+        <!-- center content -->
+        <div id='content' class="col">
+            
+	
+        
+<div> 
+    <div class="row">
+        <div class="titleCont col">
+        	
+	            <a href='/posts/pg-pong.html' class='title'>Making a Pong AI with Policy Gradients</a>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jun 30 2017</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+				<p>This post will walk through training a pong AI using policy gradients, a type of reenforcement learning. This model continually plays against a hard coded AI, using a neural net to decide on the move it makes. As it plays, it's actions are rewarded if they produce a score and discouraged if the opponent scores. Over time the idea is that the AI's move will become better and better as good play is encouraged.</p>
+<p style="text-align:center">
+<img src="/imgs/pong.gif"></img>
+</p>
+
+	        
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class='col'>
+    	    <a class='readmore' href='/posts/pg-pong.html'>Read More →</a>
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/tensorflow.html">tensorflow</a>
+        
+            <a class='tag' href="/tags/PG.html">PG</a>
+        
+            <a class='tag' href="/tags/pong.html">pong</a>
+        
+            <a class='tag' href="/tags/SoT.html">SoT</a>
+        
+        </div>
+    </div>
+
+    
+</div>
+
+        <hr />
+	
+        
+<div> 
+    <div class="row">
+        <div class="titleCont col">
+        	
+	            <a href='/posts/gan-mnist.html' class='title'>Generating MNIST Digits with CGANs</a>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jun 25 2017</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+				<p>This post will walk through creating a Conditional Generative Adversarial Network (CGAN) to generate MNIST digits. The model works by having one neural net that generates an image, and another net that tries to determine if an image is real or generated. By competing, the generator slowly learns to make better and better &quot;forgeries&quot; of real MNIST digits.</p>
+<p style="text-align:center">
+<img src="/imgs/GAN-MNIST.gif"></img>
+</p>
+
+	        
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class='col'>
+    	    <a class='readmore' href='/posts/gan-mnist.html'>Read More →</a>
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/tensorflow.html">tensorflow</a>
+        
+            <a class='tag' href="/tags/MNIST.html">MNIST</a>
+        
+            <a class='tag' href="/tags/GAN.html">GAN</a>
+        
+            <a class='tag' href="/tags/CGAN.html">CGAN</a>
+        
+            <a class='tag' href="/tags/SoT.html">SoT</a>
+        
+        </div>
+    </div>
+
+    
+</div>
+
+        <hr />
+	
+        
+<div> 
+    <div class="row">
+        <div class="titleCont col">
+        	
+	            <a href='/posts/style-transfer.html' class='title'>Style Transfer</a>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jun 24 2017</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+				<p>In this post I'm going to walk through Style Transfer using the method described in <a href="https://arxiv.org/pdf/1508.06576v2.pdf">Gatys et al. 2015</a> with the <a href="http://www.robots.ox.ac.uk/~vgg/research/very_deep/">VGG Very-Deep 19</a> model as the source for filter weights.</p>
+<p>We will be taking two images and attemp to transfer the style of one to the other, without losing the content of the recieving image. See the following example (more included at bottom of the post):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Content</th>
+<th align="center">Style</th>
+<th align="center">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><img style='width: 100%' src="/imgs/ipynb/blueno.jpg"></td>
+<td align="center"><img style='width: 100%' src="/imgs/ipynb/starry_night.jpg"></td>
+<td align="center"><img style='width: 100%' src="/imgs/ipynb/out1.png"></td>
+</tr>
+</tbody>
+</table>
+
+	        
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class='col'>
+    	    <a class='readmore' href='/posts/style-transfer.html'>Read More →</a>
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/tensorflow.html">tensorflow</a>
+        
+            <a class='tag' href="/tags/CNN.html">CNN</a>
+        
+            <a class='tag' href="/tags/style-transfer.html">style-transfer</a>
+        
+            <a class='tag' href="/tags/SoT.html">SoT</a>
+        
+        </div>
+    </div>
+
+    
+</div>
+
+        <hr />
+	
+        
+<div> 
+    <div class="row">
+        <div class="titleCont col">
+        	
+	            <a href='/posts/cnn-mnist.html' class='title'>Convolutional Neural Network for MNIST</a>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jun 23 2017</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+				<p>In this post I'm going to walk through implementing a Convolutional Neural Network in TensorFlow to classify MNIST digits.</p>
+<p style="text-align:center">
+<img src="/imgs/ipynb/CNN.png" style="width:500px;"></img>
+<p style="text-align:center">
+
+	        
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class='col'>
+    	    <a class='readmore' href='/posts/cnn-mnist.html'>Read More →</a>
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/tensorflow.html">tensorflow</a>
+        
+            <a class='tag' href="/tags/CNN.html">CNN</a>
+        
+            <a class='tag' href="/tags/MNIST.html">MNIST</a>
+        
+            <a class='tag' href="/tags/SoT.html">SoT</a>
+        
+        </div>
+    </div>
+
+    
+</div>
+
+        <hr />
+	
+        
+<div> 
+    <div class="row">
+        <div class="titleCont col">
+        	
+	            <a href='/posts/ffnn-mnist.html' class='title'>Feed-Forward Neural Net for MNIST</a>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jun 22 2017</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+				<p>In this post I'm going to walk through implementing a Feed-Forward Neural Net in TensorFlow to classify MNIST digits.</p>
+<p style="text-align:center">
+<img src="/imgs/ipynb/FF.png" style="width: 500px"></img>
+</p>
+
+	        
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class='col'>
+    	    <a class='readmore' href='/posts/ffnn-mnist.html'>Read More →</a>
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/tensorflow.html">tensorflow</a>
+        
+            <a class='tag' href="/tags/FFNN.html">FFNN</a>
+        
+            <a class='tag' href="/tags/MNIST.html">MNIST</a>
+        
+            <a class='tag' href="/tags/SoT.html">SoT</a>
+        
+        </div>
+    </div>
+
+    
+</div>
+
+        <hr />
+	
+	<div class='btm-btns' style='text-align: center;'>
+	
+	<a class='readmore' href='/index1.html'>← Past</a>
+	
+	
+	<div>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

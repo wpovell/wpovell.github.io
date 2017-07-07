@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+    
+    <title>Style Transfer</title>
+</head>
+
+<body>
+<div id='container' class='container-fluid'>
+    <div class="row">
+        <div id='sidebar' class="col-md-2">
+            
+                <h1><a href='/'>wpovell's blog</a></h1>
+            
+                <a href='/about.html' class='sd-link'>About</a>
+                <br/>
+                <a href='/tags/' class='sd-link'>Archive</a>
+                <br/>
+                <a href='/resume.pdf' class='sd-link'>Resume</a>
+                <br />
+                <a href='http://github.com/wpovell/'><i class="sd-link fa fa-github" aria-hidden="true"></i></a>
+                <a href='mailto:william_povell@brown.edu'><i class="sd-link fa fa-envelope" aria-hidden="true"></i></a>
+                <a href='https://www.linkedin.com/in/william-povell'><i class="sd-link fa fa-linkedin-square" aria-hidden="true"></i></a>
+        </div>
+        <!-- center content -->
+        <div id='content' class="col">
+            
+	
+<div class='post'>
+    <div class="row">
+        <div class="titleCont col">
+        	
+        		<p class='title'>Style Transfer</p>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jun 24 2017</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+	        	<p><em>This post is a part of my <a href="/posts/summer-of-tensorflow.html">Summer of Tensorflow</a> series.</em></p>
+<p>In this post I'm going to walk through Style Transfer using the method described in <a href="https://arxiv.org/pdf/1508.06576v2.pdf">Gatys et al. 2015</a> with the <a href="http://www.robots.ox.ac.uk/~vgg/research/very_deep/">VGG Very-Deep 19</a> model as the source for filter weights.</p>
+<p>We will be taking two images and attemp to transfer the style of one to the other, without losing the content of the recieving image. See the following example (more included at bottom of the post):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Content</th>
+<th align="center">Style</th>
+<th align="center">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"><img style='width: 100%' src="/imgs/ipynb/blueno.jpg"></td>
+<td align="center"><img style='width: 100%' src="/imgs/ipynb/starry_night.jpg"></td>
+<td align="center"><img style='width: 100%' src="/imgs/ipynb/out1.png"></td>
+</tr>
+</tbody>
+</table>
+<style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI colors. */
+.ansibold {
+  font-weight: bold;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  border-left-width: 1px;
+  padding-left: 5px;
+  background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #90CAF9;
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected {
+  border-color: #ababab;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  div.cell.selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected.jupyter-soft-selected {
+  border-left-width: 0;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 7px, #E3F2FD 7px, #E3F2FD 100%);
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #66BB6A -40px, #66BB6A 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  padding: 0.4em;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. We need the 0 value because of how we size */
+  /* .CodeMirror-lines */
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+.rendered_html pre,
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+.rendered_html td,
+
+
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style>
+<style type="text/css">
+/* Temporary definitions which will become obsolete with Notebook release 5.0 */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Code adapted from <a href="http://web.stanford.edu/class/cs20si/">Stanford CS20SI</a>.</p>
+<h2 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">scipy.io</span>
+
+<span class="k">def</span> <span class="nf">vgg_weights</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">""" Return the weights and biases already trained by VGG.</span>
+<span class="sd">    This is all related to the format of the VGG model and isn't that interesting.</span>
+<span class="sd">    """</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">vgg_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">layer</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">vgg_layers</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">layer</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">2</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">W</span><span class="p">,</span> <span class="n">b</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">prev_layer</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="sd">""" Return the Conv2D layer with RELU using the weights, biases from the VGG</span>
+<span class="sd">    model at 'layer'.</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        vgg_layers: holding all the layers of VGGNet</span>
+<span class="sd">        prev_layer: the output tensor from the previous layer</span>
+<span class="sd">        layer: the index to current layer in vgg_layers</span>
+
+<span class="sd">    Output:</span>
+<span class="sd">        relu applied on the convolution.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Get the weights from the vgg model for the current layer</span>
+    <span class="n">W</span><span class="p">,</span> <span class="n">b</span> <span class="o">=</span> <span class="n">vgg_weights</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">layer</span><span class="p">)</span>
+
+    <span class="c1"># These are consts because they're already trained, we won't be changing them</span>
+    <span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">W</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">'weights'</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">constant</span><span class="p">(</span><span class="n">b</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">'bias'</span><span class="p">)</span>
+    
+    <span class="n">conv2d</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">prev_layer</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="n">W</span><span class="p">,</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s1">'SAME'</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">conv2d</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">avgpool</span><span class="p">(</span><span class="n">prev_layer</span><span class="p">):</span>
+    <span class="sd">""" Return the average pooling layer. The paper suggests that average pooling</span>
+<span class="sd">    actually works better than max pooling.</span>
+<span class="sd">    Input:</span>
+<span class="sd">        prev_layer: the output tensor from the previous layer</span>
+
+<span class="sd">    Output:</span>
+<span class="sd">        the output of the tf.nn.avg_pool() function.</span>
+<span class="sd">    """</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">avg_pool</span><span class="p">(</span><span class="n">prev_layer</span><span class="p">,</span> <span class="n">ksize</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">strides</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> 
+                          <span class="n">padding</span><span class="o">=</span><span class="s1">'SAME'</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">'avg_pool_'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Building-The-Graph">Building The Graph<a class="anchor-link" href="#Building-The-Graph">¶</a></h2><p>The first thing we do is load in the pre-trained weights from the VGG model. We then create the image variable that we'll be styling. Using the functions defined above, we run the image variable through the layers of convolution and pooling, saving the value at each step.</p>
+<p>Note: The reason the layer numbers jump around is we skip layers (1,3,4,6, ... etc.) that represent the pooling and relu which we are performing ourselves.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Output image size</span>
+<span class="c1"># Larger images will take longer to train &</span>
+<span class="c1"># may not work as well as VGG was trained on small imgs</span>
+<span class="n">IMAGE_HEIGHT</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="n">IMAGE_WIDTH</span> <span class="o">=</span> <span class="mi">666</span>
+
+<span class="c1"># Use variable instead of placeholder because we're training the intial image to make it</span>
+<span class="c1"># look like both the content image and the style image</span>
+<span class="n">input_image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="n">IMAGE_HEIGHT</span><span class="p">,</span> <span class="n">IMAGE_WIDTH</span><span class="p">,</span> <span class="mi">3</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+<span class="c1"># Load in weights from the pre-trained vgg model</span>
+<span class="n">vgg</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">io</span><span class="o">.</span><span class="n">loadmat</span><span class="p">(</span><span class="s1">'data/vgg19.mat'</span><span class="p">)</span>
+<span class="n">vgg_layers</span> <span class="o">=</span> <span class="n">vgg</span><span class="p">[</span><span class="s1">'layers'</span><span class="p">]</span>
+
+<span class="c1"># Build up our graph, passing the input_image through our trained weights</span>
+<span class="n">graph</span> <span class="o">=</span> <span class="p">{}</span> 
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv1_1'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">input_image</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv1_2'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv1_1'</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool1'</span><span class="p">]</span> <span class="o">=</span> <span class="n">avgpool</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s1">'conv1_2'</span><span class="p">])</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv2_1'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool1'</span><span class="p">],</span> <span class="mi">5</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv2_2'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv2_1'</span><span class="p">],</span> <span class="mi">7</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool2'</span><span class="p">]</span> <span class="o">=</span> <span class="n">avgpool</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s1">'conv2_2'</span><span class="p">])</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_1'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool2'</span><span class="p">],</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_2'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_1'</span><span class="p">],</span> <span class="mi">12</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_3'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_2'</span><span class="p">],</span> <span class="mi">14</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_4'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_3'</span><span class="p">],</span> <span class="mi">16</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool3'</span><span class="p">]</span> <span class="o">=</span> <span class="n">avgpool</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s1">'conv3_4'</span><span class="p">])</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_1'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool3'</span><span class="p">],</span> <span class="mi">19</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_2'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_1'</span><span class="p">],</span> <span class="mi">21</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_3'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_2'</span><span class="p">],</span> <span class="mi">23</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_4'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_3'</span><span class="p">],</span> <span class="mi">25</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool4'</span><span class="p">]</span> <span class="o">=</span> <span class="n">avgpool</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s1">'conv4_4'</span><span class="p">])</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_1'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool4'</span><span class="p">],</span> <span class="mi">28</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_2'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_1'</span><span class="p">],</span> <span class="mi">30</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_3'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_2'</span><span class="p">],</span> <span class="mi">32</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_4'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">conv2d_relu</span><span class="p">(</span><span class="n">vgg_layers</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_3'</span><span class="p">],</span> <span class="mi">34</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'avgpool5'</span><span class="p">]</span> <span class="o">=</span> <span class="n">avgpool</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s1">'conv5_4'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Making-Images">Making Images<a class="anchor-link" href="#Making-Images">¶</a></h2><p>We start by loading in our <code>STYLE_IMAGE</code> and <code>CONTENT_IMAGE</code>. For the example, I use a picture of Blueno and Starry Night by Picasso:</p>
+<div style="text-align:center; margin-top: 10px;"><img src="/imgs/ipynb/blueno.jpg" style="width:40%; display: inline-block;"/> <img src="/imgs/ipynb/starry_night.jpg" style="width:40%; display: inline-block; margin: 0"/></div><p>We crop as necessary and subtract out <code>MEAN_PIXELS</code> since the VGG model was trained on mean normalized pixel values.</p>
+<p>Finally, we generate the slightly noised version of the <code>CONTENT_IMAGE</code> that we're going to generate the style of:</p>
+<p><img src="/imgs/ipynb/blueno_noised.png" style="margin: auto; width:40%"/></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span><span class="p">,</span> <span class="n">ImageOps</span>
+<span class="k">def</span> <span class="nf">get_resized_image</span><span class="p">(</span><span class="n">img_path</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">):</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">ImageOps</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">Image</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">generate_noise_image</span><span class="p">(</span><span class="n">content_image</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">noise_ratio</span><span class="o">=</span><span class="mf">0.6</span><span class="p">):</span>
+    <span class="sd">"""Take our content image and fuzz it a bit </span>
+<span class="sd">    """</span>
+    <span class="n">noise_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="o">-</span><span class="mi">20</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> 
+                                    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">noise_image</span> <span class="o">*</span> <span class="n">noise_ratio</span> <span class="o">+</span> <span class="n">content_image</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">noise_ratio</span><span class="p">)</span>
+
+<span class="c1"># parameters to manage experiments</span>
+<span class="n">STYLE_IMAGE</span> <span class="o">=</span> <span class="s1">'styles/starry_night.jpg'</span>
+<span class="n">CONTENT_IMAGE</span> <span class="o">=</span> <span class="s1">'content/blueno.jpg'</span>
+
+<span class="n">MEAN_PIXELS</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">123.68</span><span class="p">,</span> <span class="mf">116.779</span><span class="p">,</span> <span class="mf">103.939</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="sd">""" MEAN_PIXELS is defined according to description on their github:</span>
+<span class="sd">https://gist.github.com/ksimonyan/211839e770f7b538e2d8</span>
+<span class="sd">'In the paper, the model is denoted as the configuration D trained with scale jittering. </span>
+<span class="sd">The input images should be zero-centered by mean pixel (rather than mean image) subtraction. </span>
+<span class="sd">Namely, the following BGR values should be subtracted: [103.939, 116.779, 123.68].'</span>
+<span class="sd">"""</span>
+
+<span class="n">content_image</span> <span class="o">=</span> <span class="n">get_resized_image</span><span class="p">(</span><span class="n">CONTENT_IMAGE</span><span class="p">,</span> <span class="n">IMAGE_HEIGHT</span><span class="p">,</span> <span class="n">IMAGE_WIDTH</span><span class="p">)</span>
+<span class="n">content_image</span> <span class="o">=</span> <span class="n">content_image</span> <span class="o">-</span> <span class="n">MEAN_PIXELS</span>
+
+<span class="n">style_image</span> <span class="o">=</span> <span class="n">get_resized_image</span><span class="p">(</span><span class="n">STYLE_IMAGE</span><span class="p">,</span> <span class="n">IMAGE_HEIGHT</span><span class="p">,</span> <span class="n">IMAGE_WIDTH</span><span class="p">)</span>
+<span class="n">style_image</span> <span class="o">=</span> <span class="n">style_image</span> <span class="o">-</span> <span class="n">MEAN_PIXELS</span>
+
+<span class="c1"># percentage weight of the noise for intermixing with the content image</span>
+<span class="n">NOISE_RATIO</span> <span class="o">=</span> <span class="mf">0.6</span>
+<span class="n">initial_image</span> <span class="o">=</span> <span class="n">generate_noise_image</span><span class="p">(</span><span class="n">content_image</span><span class="p">,</span> <span class="n">IMAGE_HEIGHT</span><span class="p">,</span> <span class="n">IMAGE_WIDTH</span><span class="p">,</span> <span class="n">NOISE_RATIO</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Defining-Loss">Defining Loss<a class="anchor-link" href="#Defining-Loss">¶</a></h2><p>This is where the meat of the algorithm lies. Our goal is to create an image that has the style of one image and the content of another, so we should define our loss with this in mind. One way to express this total loss is as a linear combination of the style loss and content loss. We can then play around with the ratio to find a result that balances the two nicely.</p>
+$$\begin{align*}
+\vec{p} &= \text{The picture we want the content of} \\
+\vec{a} &= \text{The art we want the style of} \\
+\vec{x} &= \text{The resulting image we generate} \\
+\mathcal{L}_{total}(\vec{p}, \vec{a}, \vec{x}) &= \alpha \mathcal{L}_{content}(\vec{p}, \vec{x}) + \beta \mathcal{L}_{style}(\vec{a}, \vec{x})
+\end{align*}$$<h3 id="Content-Loss">Content Loss<a class="anchor-link" href="#Content-Loss">¶</a></h3><p>The paper defines content loss as follows:</p>
+<p>Let us define $F^l$ as the activation of layer $l$ in response to our generated image $\vec{x}$. $F^l_{ij}$ then represents the activation of the $i$th filter at position $j$ in layer $l$. We can similarly define $P^l_{ij}$, but for the original image rather than our generated one.</p>
+<p>We can then define the loss as the squared error between these values:</p>
+$$ \mathcal{L}_{content}(\vec{p}, \vec{x}, l) = \frac{1}{2} \sum \limits_{i,j} (F^l_{ij} - P^l_{ij})^2 $$<p>where $l$ is the layer we choose to measure the loss on. For the implementation shown in the notebook, <code>conv4_2</code> is chosen.</p>
+<p>It makes sense that this would be a good measure of content loss; two similar images should activate the CNN similarly. The paper additionally argues for using higher layers of the CNN to measure this loss. Lower layers are very close to the original pixel values, so encode much of the original image (including its style). Higher layers on the otherhand are closer to the classification of the image and focus more on structural features, therefore being more a measure of content than style.</p>
+<p>The paper backs up this reasoning by taking images of random noise and trying to train them so as to minimize the content loss. When the content loss is measured on lower layers, the result is almost pixel-perfect to the original image. Higher layers, however, lose some of the pixel content but are still maintain the overall look of the picture. See the figure at the bottom of this cell for illustration.</p>
+<h3 id="Style-Loss">Style Loss<a class="anchor-link" href="#Style-Loss">¶</a></h3><p>Now on to style loss. This was definitely the most confusing part of the alogrithm. The paper defines style loss as follows:</p>
+<p>Let us define $F$ the same as we did for content loss. Let us consider $G^l$, the Gram matrix for the set of filters in the layer $l$:</p>
+$$ G^l_{ij} = \sum\limits_k F^l_{ik} F^l_{jk} $$<p>This is esstentially all possible dot products between any two filters of the layer. We then consider $A$ as similarly defined, but for our style image $\vec{a}$ rather than our generated image $\vec{x}$. Let us also define $N_l$ as the number of filters a layer $l$ has and $M_l$ to be the size of each one of these filters. The style loss for a paticular layer $l$ is then defined as</p>
+$$ E_l = \frac{1}{4N^2_l M^2_l} \sum\limits_{i,j} (G^l_{ij} - A^l_{ij})^2 $$<p>We then linearly combine the style loss of each layer, each with their own weight $w_l$:</p>
+$$ \mathcal{L}_{style}(\vec{a}, \vec{x}) = \sum\limits_{l=0}^L w_l E_l $$<p>Phew that was confusing. Unlike content loss, I don't have as good of an intuitive understanding of how this works, and based on searches online I'm not alone. Generally, this distance between Gram matrices seems to measure the correlation of features in such a way that isn't spatially dependent and doesn't pick up on a lot of content.</p>
+<p>The paper argues for this measure of style loss with the figure below. It seems if you try to reconstruct an image from noise by minimizing this loss, you get results that show a similar style but don't have features that correspond spatially to the original image. Additionally, as you use higher layers, you get a result that depicts larger and larger scale style.</p>
+<p><img src="/imgs/ipynb/loss_recreation.png" style="width: 100%"/></imgs></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">gram_matrix</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
+    <span class="sd">""" Create and return the gram matrix for tensor F</span>
+<span class="sd">    """</span>
+    <span class="n">F</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">F</span><span class="p">,</span> <span class="p">(</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="n">F</span><span class="p">),</span> <span class="n">F</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">single_style_loss</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">g</span><span class="p">):</span>
+    <span class="sd">""" Calculate the style loss at a certain layer</span>
+<span class="sd">    Inputs:</span>
+<span class="sd">        a is the feature representation of the real image</span>
+<span class="sd">        g is the feature representation of the generated image</span>
+<span class="sd">    Output:</span>
+<span class="sd">        the style loss at a certain layer (which is E_l in the paper)</span>
+<span class="sd">    """</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="c1"># number of filters</span>
+    <span class="n">M</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># height times width of the feature map</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">gram_matrix</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="n">G</span> <span class="o">=</span> <span class="n">gram_matrix</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">N</span><span class="p">,</span> <span class="n">M</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">((</span><span class="n">G</span> <span class="o">-</span> <span class="n">A</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">((</span><span class="mi">2</span> <span class="o">*</span> <span class="n">N</span> <span class="o">*</span> <span class="n">M</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+<span class="c1"># Layers used for style features.</span>
+<span class="n">STYLE_LAYERS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'conv1_1'</span><span class="p">,</span> <span class="s1">'conv2_1'</span><span class="p">,</span> <span class="s1">'conv3_1'</span><span class="p">,</span> <span class="s1">'conv4_1'</span><span class="p">,</span> <span class="s1">'conv5_1'</span><span class="p">]</span>
+<span class="n">W</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">]</span> <span class="c1"># give more weights to deeper layers.</span>
+
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_image</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">style_image</span><span class="p">))</span>
+    <span class="n">A</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">graph</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span> <span class="k">for</span> <span class="n">layer_name</span> <span class="ow">in</span> <span class="n">STYLE_LAYERS</span><span class="p">])</span>
+
+<span class="c1"># Get layer losses</span>
+<span class="n">E</span> <span class="o">=</span> <span class="p">[</span><span class="n">single_style_loss</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">graph</span><span class="p">[</span><span class="n">STYLE_LAYERS</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">STYLE_LAYERS</span><span class="p">))]</span>
+<span class="c1"># Linearly combine layer losses</span>
+<span class="n">n_layers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">STYLE_LAYERS</span><span class="p">)</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'style_loss'</span><span class="p">]</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">W</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">E</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layers</span><span class="p">)])</span>
+
+
+<span class="c1"># Layer used for content features.</span>
+<span class="n">CONTENT_LAYER</span> <span class="o">=</span> <span class="s1">'conv4_2'</span>
+
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_image</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">content_image</span><span class="p">))</span> <span class="c1"># assign content image to the input variable</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="n">CONTENT_LAYER</span><span class="p">])</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">graph</span><span class="p">[</span><span class="n">CONTENT_LAYER</span><span class="p">]</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'content_loss'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">((</span><span class="n">f</span> <span class="o">-</span> <span class="n">p</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mf">4.0</span> <span class="o">*</span> <span class="n">p</span><span class="o">.</span><span class="n">size</span><span class="p">)</span>
+
+<span class="n">CONTENT_WEIGHT</span> <span class="o">=</span> <span class="mf">0.01</span>
+<span class="n">STYLE_WEIGHT</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'total_loss'</span><span class="p">]</span> <span class="o">=</span> <span class="n">CONTENT_WEIGHT</span> <span class="o">*</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'content_loss'</span><span class="p">]</span> <span class="o">+</span>
+                        <span class="n">STYLE_WEIGHT</span> <span class="o">*</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'style_loss'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Training">Training<a class="anchor-link" href="#Training">¶</a></h2><p>Now on to the fun stuff! This part is pretty straight forward, just initialize the variables and run the optimizer for 300 iterations! It's set up to report loss & time as well as save out the current generated image at various intervals.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">time</span>
+
+<span class="n">graph</span><span class="p">[</span><span class="s1">'global_step'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span> <span class="n">trainable</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">'global_step'</span><span class="p">)</span>
+
+<span class="n">LEARNING_RATE</span> <span class="o">=</span> <span class="mf">2.0</span>
+<span class="n">graph</span><span class="p">[</span><span class="s1">'optimizer'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">LEARNING_RATE</span><span class="p">)</span><span class="o">.</span><span class="n">minimize</span><span class="p">(</span>
+                        <span class="n">graph</span><span class="p">[</span><span class="s1">'total_loss'</span><span class="p">],</span> 
+                        <span class="n">global_step</span><span class="o">=</span><span class="n">graph</span><span class="p">[</span><span class="s1">'global_step'</span><span class="p">])</span>
+
+<span class="n">ITERS</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">skip_step</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+    <span class="c1"># Initialize vars</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+    <span class="c1"># Assign our initial image that we'll be modifying</span>
+    <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_image</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">initial_image</span><span class="p">))</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">ITERS</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">index</span> <span class="o">>=</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">index</span> <span class="o"><</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">skip_step</span> <span class="o">=</span> <span class="mi">10</span>
+        <span class="k">elif</span> <span class="n">index</span> <span class="o">>=</span> <span class="mi">20</span><span class="p">:</span>
+            <span class="n">skip_step</span> <span class="o">=</span> <span class="mi">20</span>
+
+        <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">graph</span><span class="p">[</span><span class="s1">'optimizer'</span><span class="p">])</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">skip_step</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">gen_image</span><span class="p">,</span> <span class="n">total_loss</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">([</span><span class="n">input_image</span><span class="p">,</span> <span class="n">graph</span><span class="p">[</span><span class="s1">'total_loss'</span><span class="p">]])</span>
+            <span class="c1"># Readd the mean we subtracted earlier</span>
+            <span class="n">gen_image</span> <span class="o">=</span> <span class="n">gen_image</span> <span class="o">+</span> <span class="n">MEAN_PIXELS</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">'Step </span><span class="si">{}</span><span class="se">\n</span><span class="s1">   Sum: </span><span class="si">{:5.1f}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">index</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">gen_image</span><span class="p">)))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">'   Loss: </span><span class="si">{:5.1f}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">total_loss</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">'   Time: </span><span class="si">{}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">))</span>
+            <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+            <span class="n">filename</span> <span class="o">=</span> <span class="s1">'outputs/</span><span class="si">%d</span><span class="s1">.png'</span> <span class="o">%</span> <span class="p">(</span><span class="n">index</span><span class="p">)</span>
+            
+            <span class="n">image</span> <span class="o">=</span> <span class="n">gen_image</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="c1"># the image</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s1">'uint8'</span><span class="p">)</span>
+            <span class="n">scipy</span><span class="o">.</span><span class="n">misc</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Results">Results<a class="anchor-link" href="#Results">¶</a></h2><p>I've only run this on my laptop CPU where 300 iterations takes a couple hours to finish. Often times you won't see much of a change in the image after the first 100 or so iterations, though.</p>
+<p><img src="/imgs/ipynb/blueno.gif"/></p>
+<p>Some other images I've generated:</p>
+<table>
+<thead><tr>
+<th style="text-align:center">Content</th>
+<th style="text-align:center">Style</th>
+<th style="text-align:center">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center"><img src="/imgs/ipynb/blueno.jpg" style="width:100%"/></td>
+<td style="text-align:center"><img src="/imgs/ipynb/picasso2.jpg" style="width:100%"/></td>
+<td style="text-align:center"><img src="/imgs/ipynb/out2.png" style="width:100%"/></td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center"><img src="/imgs/ipynb/hokusai.jpg" style="width:100%"/></td>
+<td style="text-align:center"><img src="/imgs/ipynb/out3.png" style="width:100%"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+	        
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/tensorflow.html">tensorflow</a>
+        
+            <a class='tag' href="/tags/CNN.html">CNN</a>
+        
+            <a class='tag' href="/tags/style-transfer.html">style-transfer</a>
+        
+            <a class='tag' href="/tags/SoT.html">SoT</a>
+        
+        </div>
+    </div>
+
+    
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_config = function () {
+    this.page.identifier = 'style-transfer';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wpovell.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+</div>
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

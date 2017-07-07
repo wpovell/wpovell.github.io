@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+    
+    <title>New Blog</title>
+</head>
+
+<body>
+<div id='container' class='container-fluid'>
+    <div class="row">
+        <div id='sidebar' class="col-md-2">
+            
+                <h1><a href='/'>wpovell's blog</a></h1>
+            
+                <a href='/about.html' class='sd-link'>About</a>
+                <br/>
+                <a href='/tags/' class='sd-link'>Archive</a>
+                <br/>
+                <a href='/resume.pdf' class='sd-link'>Resume</a>
+                <br />
+                <a href='http://github.com/wpovell/'><i class="sd-link fa fa-github" aria-hidden="true"></i></a>
+                <a href='mailto:william_povell@brown.edu'><i class="sd-link fa fa-envelope" aria-hidden="true"></i></a>
+                <a href='https://www.linkedin.com/in/william-povell'><i class="sd-link fa fa-linkedin-square" aria-hidden="true"></i></a>
+        </div>
+        <!-- center content -->
+        <div id='content' class="col">
+            
+	
+<div class='post'>
+    <div class="row">
+        <div class="titleCont col">
+        	
+        		<p class='title'>New Blog</p>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jun 21 2017</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+	        	<p>It seems like every few years I get dissatisfied with the blogging platform I'm using and make a new one. This time around I decided to go for a static site much like the first github site I made back in the day:</p>
+<p><img style="display:block;margin: auto; width:70%" src="/imgs/blog_pt1.png"></img></p>
+<p>I wanted to roll my own mainly because with my last blog I never got into customizing it much due to my lack of experience with PHP/Wordpress templates. For this blog I considered using <a href="http://docs.getpelican.com/en/stable/">Pelican</a> and other static site generators, but they seemed like more than I needed. Currently the blog is just based around a few <a href="http://jinja.pocoo.org/docs/2.9/">Jinja2</a> templates and a single generator script that I used to insert markdown files. The main hassle was that I wanted to include iPython notebooks in my posts, however the guy who runs <a href="http://jakevdp.github.io/">Pythonic Perambulations</a> made a nice script that converts <code>.ipynb</code>s into clean HTML that can be inserted without much hassel.</p>
+
+	        
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/blog.html">blog</a>
+        
+        </div>
+    </div>
+
+    
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_config = function () {
+    this.page.identifier = 'new-blog';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wpovell.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+</div>
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

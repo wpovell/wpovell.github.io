@@ -1,0 +1,16 @@
+
+
+.post-list {
+	list-style: none;
+	padding: 0;
+	margin-top: 30px;
+}
+
+.post-list > li > span {
+	float: right;
+}
+
+#content {
+	margin-left: 10%;
+	margin-right: 10%;
+}
