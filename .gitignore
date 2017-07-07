@@ -1,0 +1,6 @@
+ipynb/data/
+ipynb/imgs/
+ipynb/out/
+dist/
+__pycache__
+.ipynb_checkpoints
