@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% from "macros.html" import insertPost %}
+
+{% block content %}
+	{% for post in blog %}
+        {{ insertPost(post, True) }}
+        <hr />
+	{% endfor %}
+	<div class='btm-btns' style='text-align: center;'>
+	{% if past %}
+	<a class='readmore' href='{{past}}'>← Past</a>
+	{% endif %}
+	{% if future %}
+		<a class='readmore' href='{{future}}'>Future →</a>
+	{% endif %}
+	<div>
+{% endblock %}

@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% from "macros.html" import insertPost %}
+
+{% block content %}
+	{{ insertPost(post, False) }}
+{% endblock %}

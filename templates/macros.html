@@ -1,0 +1,65 @@
+{% macro insertPost(post, short) %}
+{% if short %}<div> {% else %}<div class='post'>{% endif %}
+    <div class="row">
+        <div class="titleCont col">
+        	{% if short %}
+	            <a href='{{ post.url }}' class='title'>{{ post.title }}</a>
+        	{% else %}
+        		<p class='title'>{{ post.title }}</p>
+        	{% endif %}
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>{{ post.time }}</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	{% if short %}
+				{{ post.short |safe }}
+	        {% else %}
+	        	{{ post |safe }}
+	        {% endif %}
+        </div>
+    </div>
+    {% if short and post.has_short %}
+    <div class="row">
+        <div class='col'>
+    	    <a class='readmore' href='{{ post.url }}'>Read More →</a>
+        </div>
+    </div>
+    {% endif %}
+    <div class="row tags">
+        <div class="col">
+        Tags: {% for tag in post.tags %}
+            <a class='tag' href="/tags/{{tag}}.html">{{ tag }}</a>
+        {% endfor %}
+        </div>
+    </div>
+
+    {% if not short %}
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_config = function () {
+    this.page.identifier = '{{ post.slug }}';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wpovell.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro postList(posts) %}
+<ul class='post-list'>
+{% for post in posts %}
+<li><a href='{{ post.url }}'>{{ post.title }}</a><span class='time'>{{post.shortTime}}</span>
+{% endfor %}
+</li>
+{% endmacro %}

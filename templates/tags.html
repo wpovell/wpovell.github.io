@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% from "macros.html" import postList %}
+{% block extra_style %}
+<link rel="stylesheet" type="text/css" href="/css/tags.css">
+{% endblock %}
+
+{% block content %}
+<h1 class='title'>Archive &amp; Tags</h1>
+
+<div>
+{% for tag in tags %}
+	<a class='tag' href='/tags/{{tag[0]}}.html'>{{tag[0]}} ({{tag[1]}})</a>
+{% endfor %}
+</div>
+
+{{ postList(posts) }}
+{% endblock %}
