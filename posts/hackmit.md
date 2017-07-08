@@ -1,9 +1,8 @@
 title: HackMIT CAPTCHA Detection
 tags: tensorflow,CNN,HackMIT
-time: 17-7-6 1:30PM
+time: 17-7-8 7:30PM
 slug: captcha-hackmit
 ipython: ipynb/captcha_hackmit.ipynb
-hide:
 
 [HackMIT](http://hackmit.org) opened its registration recently and as a tradition offered a series of admission puzzles. There were five total involving various CS topics, including crypto and machine learning. The last puzzle was definitely my favorite so I thought I'd walk through my solution. The challenge was as follows: Given a CAPTCHA like
 
