@@ -118,7 +118,7 @@ def genIndex(posts):
 		if i != len(indexes) - 1:
 			ind = i+1
 			kwargs['past'] = '/' if ind == 0 else f'/index{ind}.html'
-		kwargs['title'] = "Blog"
+		kwargs['title'] = "wpovell"
 		with open(os.path.join(OUT_DIR, fn), 'w') as f:
 			f.write(render_template('index.html', **kwargs))
 
@@ -145,7 +145,7 @@ def genTags(posts):
 
 def genAbout():
 	with open(os.path.join(OUT_DIR, 'about.html'), 'w') as f:
-		f.write(render_template('about.html'))
+		f.write(render_template('about.html', title="About"))
 
 def cleanDist():
 	try:
@@ -178,7 +178,7 @@ def main():
 	if 'deploy' in argv:
 		hide = True
 		cleanDist()
-		initDist()
+	initDist()
 	posts = getPosts(hide)
 	ops = [sot]
 	genIndex(posts)
