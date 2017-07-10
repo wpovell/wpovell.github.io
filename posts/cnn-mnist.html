@@ -1070,8 +1070,8 @@ L &= \operatorname{Loss}(O, Y)
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Convolution-and-Pooling">Convolution and Pooling<a class="anchor-link" href="#Convolution-and-Pooling">¶</a></h2><p>The two main transformations used in the CNN different from the FFN are convolution and pooling.</p>
-<h3 id="Convolution">Convolution<a class="anchor-link" href="#Convolution">¶</a></h3><p>From which the CNN gets its name, Convolution is a process of applying filters to the image. In our case, the filter is a 5x5 matrix which is positioned over every cell of the image, multiplying pairwise and summing. For our model we have 32 of these filters in the first convolution, and 64 for the second. The values in these are trained by tensorflow to minimize the loss.</p>
+<h2 id="Convolution-and-Pooling">Convolution and Pooling<a class="anchor-link" href="#Convolution-and-Pooling">¶</a></h2><p>The two main transformations used in the CNN different from the FFNN are convolution and pooling.</p>
+<h3 id="Convolution">Convolution<a class="anchor-link" href="#Convolution">¶</a></h3><p>From which the CNN gets its name, Convolution is a process of applying filters to the image. In our case, the filter is a 5x5 matrix which is positioned over every cell of the image, multiplying pairwise and summing. For our model we have 32 of these filters in the first convolution, and 64 for the second. The values in these are trained by TensorFlow to minimize the loss.</p>
 <p><img src="/imgs/ipynb/conv.gif" style="width:250px"/>
 <a href="http://deeplearning.stanford.edu/wiki/index.php/Feature_extraction_using_convolution">Source</a></p>
 <h3 id="Pooling">Pooling<a class="anchor-link" href="#Pooling">¶</a></h3><p>Pooling shrinks the outputted feature maps from the convolution, removing less important information. In max pooling, each 2x2 area is condensed to its largest value, cutting each side length in half (28 to 14 and 14 to 7). Average pooling is also used where the average of each pool is outputted into the new cell.</p>
@@ -1131,8 +1131,8 @@ L &= \operatorname{Loss}(O, Y)
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Feed-Forward-&-Dropout">Feed-Forward & Dropout<a class="anchor-link" href="#Feed-Forward-&-Dropout">¶</a></h2><p>Our model finishes with flattening out last pool into a giant 3136 long vector and running it through our FFN model from the last notebook. However, there is a small but important addition.</p>
-<p>Dropout disables nodes with a probability of <code>keep_prob</code>, removing them as well as their connections from the graph. This also means they aren't trained during that particular iteration. This limits the performance of the model, preventing it from overfitting the train dataset.</p>
+<h2 id="Feed-Forward-&-Dropout">Feed-Forward & Dropout<a class="anchor-link" href="#Feed-Forward-&-Dropout">¶</a></h2><p>Our model finishes with flattening out last pool into a giant 3136 long vector and running it through our FFNN model from the last notebook. However, there is a small but important addition.</p>
+<p>Dropout disables nodes with a probability of <code>keep_prob</code>, removing them as well as their connections from the graph. This also means they aren't trained during that particular iteration. This limits the performance of the model, preventing it from over fitting the train dataset.</p>
 <p><img src="/imgs/ipynb/dropout.png" style="width: 500px"/></p>
 </div>
 </div>

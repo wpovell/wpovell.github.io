@@ -1032,7 +1032,7 @@ h6:hover .anchor-link {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Code based on <a href="http://karpathy.github.io/2016/05/31/rl/">this</a> blog post.</p>
-<h1 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h1><p>Let's first look at how the environemnt in which our AI will be learning is set up. We'll be using OpenAI's gym module to simulate an openent. Once we create our environment, we can step our environment with one of three moves, do nothing, move up, and move down. After each move a screenshot of the game is returned; this is what our AI will be basing its actions off of.</p>
+<h1 id="Setup">Setup<a class="anchor-link" href="#Setup">¶</a></h1><p>Let's first look at how the environment in which our AI will be learning is set up. We'll be using OpenAI's gym module to simulate an opponent. Once we create our environment, we can step our environment with one of three moves, do nothing, move up, and move down. After each move a screenshot of the game is returned; this is what our AI will be basing its actions off of.</p>
 <p>However, we won't be giving the raw screenshots to our neural net; we'll first do some preprocessing where we remove all the data except the paddles and the ball. Also, we'll actually send the difference between consecutive processed frames since that gives a better sense of movement.</p>
 <table>
 <thead><tr>
@@ -1079,7 +1079,7 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Building-the-Model">Building the Model<a class="anchor-link" href="#Building-the-Model">¶</a></h1><p>Now that we know what our input looks like, lets build our model. We're going to just use a basic feed forward nerual net with a ReLU hidden layer of 200, outputting a probability distribution over the possible moves our AI can make.</p>
+<h1 id="Building-the-Model">Building the Model<a class="anchor-link" href="#Building-the-Model">¶</a></h1><p>Now that we know what our input looks like, lets build our model. We're going to just use a basic feed forward neural net with a ReLU hidden layer of 200, outputting a probability distribution over the possible moves our AI can make.</p>
 </div>
 </div>
 </div>
@@ -1120,11 +1120,11 @@ h6:hover .anchor-link {
 <ol>
 <li>While the game is not over:<ul>
 <li>Take in a screenshot and output a distribution over actions.</li>
-<li>Sample an action from the distribution and perform it, recieving an imediate reward.<ul>
+<li>Sample an action from the distribution and perform it, receiving an immediate reward.<ul>
 <li>+1 if AI scores, -1 if opponent scores, 0 otherwise.</li>
 </ul>
 </li>
-<li>Save the input, action performed, and immediate reward recieved.</li>
+<li>Save the input, action performed, and immediate reward received.</li>
 </ul>
 </li>
 <li>When the game is over, compute a total reward for each action that is a linear combination of all rewards after it. <ul>
@@ -1132,7 +1132,7 @@ h6:hover .anchor-link {
 <li>Normalize the mean and variance of the total rewards.</li>
 </ul>
 </li>
-<li>Encourage or discourage each action taken for its input by using the total reward as a gradient to backpropegate through the network.</li>
+<li>Encourage or discourage each action taken for its input by using the total reward as a gradient to back propagate through the network.</li>
 </ol>
 <p>e.g. This very short game</p>
 <table>
@@ -1303,7 +1303,7 @@ h6:hover .anchor-link {
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Results">Results<a class="anchor-link" href="#Results">¶</a></h1><p>One thing to know about this model is it takes a long time to train, simulating the games is slow (at least in OpenAI gym). I trained the model for 5000 episodes, taking about a day on my macbook. It definitely improved a lot as you can see below, but still did not consistently win against the AI. There are a lot of improvements that could be made to this model, mainly replacing the feed-forward net with a convolutional one.</p>
+<h1 id="Results">Results<a class="anchor-link" href="#Results">¶</a></h1><p>One thing to know about this model is it takes a long time to train, simulating the games is slow (at least in OpenAI gym). I trained the model for 5000 episodes, taking about a day on my MacBook Pro. It definitely improved a lot as you can see below, but still did not consistently win against the AI. There are a lot of improvements that could be made to this model, mainly replacing the feed-forward net with a convolutional one.</p>
 <div style="text-align:center">
 <img src="/imgs/ipynb/pong_reward.png" style="display:inline-block; width: 50%"/>
 </div><div style="text-align:center">

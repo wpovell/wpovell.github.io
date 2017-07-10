@@ -1108,7 +1108,7 @@ $$\underset{(n \times 100)}{\text{H}} = \operatorname{ReLU}(\underset{(n \times 
 $$ \underset{(n \times 10)}{\text{O}} = \operatorname{Softmax}(\underset{(n \times 100)}{\text{H}} \times
 \underset{(100 \times 10)}{\text{$W_2$}} +
 \underset{(1 \times 10)}{\text{$B_2$}}) $$<p>Softmax is defined as $$\operatorname{Softmax}(\vec{x})_j = \frac{e^{x_j}}{\sum_{i=1}^{\vert \vec{x} \vert} e^{x_i}}$$</p>
-<p>Essentially softmax takes a vector of real numbers and turn it into a vector of values between 0 and 1 that sum to 1, forming a valid probability distribution. The loss for the model is then the cross-entropy between the correct label and this probability vector (if you're not familar with cross-entropy check out <a href="https://rdipietro.github.io/friendly-intro-to-cross-entropy-loss/">this blog post</a>). This causes the model to slowly train towards the maximum probability in the output vector being the correct label. During testing, the maximum probability of the output vector is considered the prediction.</p>
+<p>Essentially softmax takes a vector of real numbers and turn it into a vector of values between 0 and 1 that sum to 1, forming a valid probability distribution. The loss for the model is then the cross-entropy between the correct label and this probability vector (if you're not familiar with cross-entropy check out <a href="https://rdipietro.github.io/friendly-intro-to-cross-entropy-loss/">this blog post</a>). This causes the model to slowly train towards the maximum probability in the output vector being the correct label. During testing, the maximum probability of the output vector is considered the prediction.</p>
 </div>
 </div>
 </div>
