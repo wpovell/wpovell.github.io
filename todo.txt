@@ -3,23 +3,25 @@ Short Term
 - Make full.pix2pix & write post
 
 Long Term
-- Deploy
 - Make generate smarter
 - Make about better
 - Disable archive/about when on page
 - Go over posts and make writing better
-- HackMIT eval when they release method
+  - Compare pong AI with Kaparthy’s impl
+    (https://gist.github.com/karpathy/a4166c7fe253700972fcbc77e4ea32c5)
 
 projs
-	- deep dream
-	- pix2pix
-		- CycleGAN
-	- VAC?
-	- Q-learning & A3C (https://medium.com/emergent-future/simple-reinforcement-learning-with-tensorflow-part-8-asynchronous-actor-critic-agents-a3c-c88f72a5e9f2)
-		- This series (https://medium.com/emergent-future/simple-reinforcement-learning-with-tensorflow-part-0-q-learning-with-tables-and-neural-networks-d195264329d0)
-	- RNNs (word2vec, sentiment, translation, languagemodelings)
-	- faster style	
-	- SVMs/Random Forest	
+- deep dream
+- pix2pix
+- CycleGAN
+- VAC?
+- Q-learning & A3C
+  (https://medium.com/emergent-future/simple-reinforcement-learning-with-tensorflow-part-8-asynchronous-actor-critic-agents-a3c-c88f72a5e9f2)
+- RNNs (word2vec, sentiment, translation, languagemodelings)
+- faster style	
+- google quick draw
+- SVMs/Random Forest	
+
 Future proj
-	- Bitcoin impl
-	- matasano?
+- Bitcoin impl
+- matasano?

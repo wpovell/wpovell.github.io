@@ -1,5 +1,5 @@
 title: Word Embedings with word2vec
-tags: tensorflow,word2vec,SoT
+tags: deep-learning,word2vec,SoT
 time: 19-7-1 8:00PM
 slug: word2vec
 ipython: ipynb/word2vec.ipynb

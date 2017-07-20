@@ -108,8 +108,7 @@ def genIndex(posts):
 	for i, ps in enumerate(indexes):
 		fn = 'index.html' if i == 0 else f'index{i}.html'
 		kwargs = {
-			'blog' : ps,
-			'index' : True,
+			'blog' : ps
 		}
 		if i != 0:
 			ind = i-1

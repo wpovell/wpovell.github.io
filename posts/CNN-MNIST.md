@@ -1,5 +1,5 @@
 title: Convolutional Neural Network for MNIST
-tags: tensorflow,CNN,MNIST,SoT
+tags: deep-learning,CNN,MNIST,SoT
 time: 17-6-23 3:30PM
 slug: cnn-mnist
 ipython: ipynb/CNN-MNIST.ipynb

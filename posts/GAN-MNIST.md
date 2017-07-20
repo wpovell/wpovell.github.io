@@ -1,5 +1,5 @@
 title: Generating MNIST Digits with CGANs
-tags: tensorflow,MNIST,GAN,CGAN,SoT
+tags: deep-learning,MNIST,GAN,SoT
 time: 17-6-25 4:00PM
 slug: gan-mnist
 ipython: ipynb/GAN-MNIST.ipynb

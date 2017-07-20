@@ -1,5 +1,5 @@
 title: Summer of TensorFlow
-tags: tensorflow,SoT
+tags: deep-learning,SoT
 time: 17-6-22 2:00PM
 slug: summer-of-tensorflow
 

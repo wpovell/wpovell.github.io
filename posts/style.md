@@ -1,5 +1,5 @@
 title: Style Transfer
-tags: tensorflow,CNN,style-transfer,SoT
+tags: deep-learning,CNN,style-transfer,SoT
 time: 17-6-24 4:00PM
 slug: style-transfer
 ipython: ipynb/style.ipynb

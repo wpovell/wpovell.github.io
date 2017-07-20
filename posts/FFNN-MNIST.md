@@ -1,5 +1,5 @@
 title: Feed-Forward Neural Net for MNIST
-tags: tensorflow,FFNN,MNIST,SoT
+tags: deep-learning,FFNN,MNIST,SoT
 time: 17-6-22 3:00PM
 slug: ffnn-mnist
 ipython: ipynb/FFNN-MNIST.ipynb

@@ -1,5 +1,5 @@
 title: HackMIT CAPTCHA Detection
-tags: tensorflow,CNN,HackMIT
+tags: deep-learning,CNN,HackMIT
 time: 17-7-8 7:30PM
 slug: captcha-hackmit
 ipython: ipynb/captcha_hackmit.ipynb
