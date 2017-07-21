@@ -1,0 +1,1703 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <!-- Bootstrap -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+	<link rel="stylesheet" type="text/css" href="/css/main.css">
+    
+    <title>Image to Image Translation with pix2pix</title>
+</head>
+
+<body>
+<div id='container' class='container-fluid'>
+    <div class="row">
+        <div id='sidebar' class="col-md-2">
+                <h1><a href='/'>wpovell's blog</a></h1>
+                <a href='/about.html' class='sd-link'>About</a>
+                <br/>
+                <a href='/tags/' class='sd-link'>Archive</a>
+                <br/>
+                <a href='/resume.pdf' class='sd-link'>Resume</a>
+                <br />
+                <a href='http://github.com/wpovell/'><i class="sd-link fa fa-github" aria-hidden="true"></i></a>
+                <a href='mailto:william_povell@brown.edu'><i class="sd-link fa fa-envelope" aria-hidden="true"></i></a>
+                <a href='https://www.linkedin.com/in/william-povell'><i class="sd-link fa fa-linkedin-square" aria-hidden="true"></i></a>
+        </div>
+        <!-- center content -->
+        <div id='content' class="col">
+            
+	
+<div class='post'>
+    <div class="row">
+        <div class="titleCont col">
+        	
+        		<p class='title'>Image to Image Translation with pix2pix</p>
+        	
+        </div>
+    </div>
+    <div class="row time-row">
+        <div class="col">
+            <span class='time'>Jul 16 2019</span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="post col">
+        	
+	        	<p>☀️ <em>This post is a part of my <a href="/posts/summer-of-tensorflow.html">Summer of Tensorflow</a> series</em> ☀️</p>
+<p>One cool application of <a href="/posts/gan-mnist.html">GANs</a> is image translation. The task is given pairs of images, can you learn to generate the output image from an input. Examples of this task would be turning satelite images into maps or coloring black and white photos. In this post we're going to walk through the <a href="https://arxiv.org/abs/1611.07004">pix2pix model by Isola et al.</a></p>
+<figure>
+<img style="width: 70%; display: block; margin:auto;" src="/imgs/ipynb/pix2pix/trans.jpg">
+<figcaption style="text-align:center">
+Image from the <a href="https://arxiv.org/abs/1611.07004">pix2pix paper</a>
+</figcaption>
+</figure>
+<style type="text/css">/*!
+*
+* IPython notebook
+*
+*/
+/* CSS font colors for translated ANSI colors. */
+.ansibold {
+  font-weight: bold;
+}
+/* use dark versions for foreground, to improve visibility */
+.ansiblack {
+  color: black;
+}
+.ansired {
+  color: darkred;
+}
+.ansigreen {
+  color: darkgreen;
+}
+.ansiyellow {
+  color: #c4a000;
+}
+.ansiblue {
+  color: darkblue;
+}
+.ansipurple {
+  color: darkviolet;
+}
+.ansicyan {
+  color: steelblue;
+}
+.ansigray {
+  color: gray;
+}
+/* and light for background, for the same reason */
+.ansibgblack {
+  background-color: black;
+}
+.ansibgred {
+  background-color: red;
+}
+.ansibggreen {
+  background-color: green;
+}
+.ansibgyellow {
+  background-color: yellow;
+}
+.ansibgblue {
+  background-color: blue;
+}
+.ansibgpurple {
+  background-color: magenta;
+}
+.ansibgcyan {
+  background-color: cyan;
+}
+.ansibggray {
+  background-color: gray;
+}
+div.cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  border-radius: 2px;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  border-width: 1px;
+  border-style: solid;
+  border-color: transparent;
+  width: 100%;
+  padding: 5px;
+  /* This acts as a spacer between cells, that is outside the border */
+  margin: 0px;
+  outline: none;
+  border-left-width: 1px;
+  padding-left: 5px;
+  background: linear-gradient(to right, transparent -40px, transparent 1px, transparent 1px, transparent 100%);
+}
+div.cell.jupyter-soft-selected {
+  border-left-color: #90CAF9;
+  border-left-color: #E3F2FD;
+  border-left-width: 1px;
+  padding-left: 5px;
+  border-right-color: #E3F2FD;
+  border-right-width: 1px;
+  background: #E3F2FD;
+}
+@media print {
+  div.cell.jupyter-soft-selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected {
+  border-color: #ababab;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  div.cell.selected {
+    border-color: transparent;
+  }
+}
+div.cell.selected.jupyter-soft-selected {
+  border-left-width: 0;
+  padding-left: 6px;
+  background: linear-gradient(to right, #42A5F5 -40px, #42A5F5 7px, #E3F2FD 7px, #E3F2FD 100%);
+}
+.edit_mode div.cell.selected {
+  border-color: #66BB6A;
+  border-left-width: 0px;
+  padding-left: 6px;
+  background: linear-gradient(to right, #66BB6A -40px, #66BB6A 5px, transparent 5px, transparent 100%);
+}
+@media print {
+  .edit_mode div.cell.selected {
+    border-color: transparent;
+  }
+}
+.prompt {
+  /* This needs to be wide enough for 3 digit prompt numbers: In[100]: */
+  min-width: 14ex;
+  /* This padding is tuned to match the padding on the CodeMirror editor. */
+  padding: 0.4em;
+  margin: 0px;
+  font-family: monospace;
+  text-align: right;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+  /* Don't highlight prompt number selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  /* Use default cursor */
+  cursor: default;
+}
+@media (max-width: 540px) {
+  .prompt {
+    text-align: left;
+  }
+}
+div.inner_cell {
+  min-width: 0;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_area {
+  border: 1px solid #cfcfcf;
+  border-radius: 2px;
+  background: #f7f7f7;
+  line-height: 1.21429em;
+}
+/* This is needed so that empty prompt areas can collapse to zero height when there
+   is no content in the output_subarea and the prompt. The main purpose of this is
+   to make sure that empty JavaScript output_subareas have no height. */
+div.prompt:empty {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+div.unrecognized_cell {
+  padding: 5px 5px 5px 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.unrecognized_cell .inner_cell {
+  border-radius: 2px;
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+  border: 1px solid #cfcfcf;
+  background: #eaeaea;
+}
+div.unrecognized_cell .inner_cell a {
+  color: inherit;
+  text-decoration: none;
+}
+div.unrecognized_cell .inner_cell a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+@media (max-width: 540px) {
+  div.unrecognized_cell > div.prompt {
+    display: none;
+  }
+}
+div.code_cell {
+  /* avoid page breaking on code cells when printing */
+}
+@media print {
+  div.code_cell {
+    page-break-inside: avoid;
+  }
+}
+/* any special styling for code cells that are currently running goes here */
+div.input {
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.input {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+/* input_area and input_prompt must match in top border and margin for alignment */
+div.input_prompt {
+  color: #303F9F;
+  border-top: 1px solid transparent;
+}
+div.input_area > div.highlight {
+  margin: 0.4em;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+div.input_area > div.highlight > pre {
+  margin: 0px;
+  border: none;
+  padding: 0px;
+  background-color: transparent;
+}
+/* The following gets added to the <head> if it is detected that the user has a
+ * monospace font with inconsistent normal/bold/italic height.  See
+ * notebookmain.js.  Such fonts will have keywords vertically offset with
+ * respect to the rest of the text.  The user should select a better font.
+ * See: https://github.com/ipython/ipython/issues/1503
+ *
+ * .CodeMirror span {
+ *      vertical-align: bottom;
+ * }
+ */
+.CodeMirror {
+  line-height: 1.21429em;
+  /* Changed from 1em to our global default */
+  font-size: 14px;
+  height: auto;
+  /* Changed to auto to autogrow */
+  background: none;
+  /* Changed from white to allow our bg to show through */
+}
+.CodeMirror-scroll {
+  /*  The CodeMirror docs are a bit fuzzy on if overflow-y should be hidden or visible.*/
+  /*  We have found that if it is visible, vertical scrollbars appear with font size changes.*/
+  overflow-y: hidden;
+  overflow-x: auto;
+}
+.CodeMirror-lines {
+  /* In CM2, this used to be 0.4em, but in CM3 it went to 4px. We need the em value because */
+  /* we have set a different line-height and want this to scale with that. */
+  padding: 0.4em;
+}
+.CodeMirror-linenumber {
+  padding: 0 8px 0 4px;
+}
+.CodeMirror-gutters {
+  border-bottom-left-radius: 2px;
+  border-top-left-radius: 2px;
+}
+.CodeMirror pre {
+  /* In CM3 this went to 4px from 0 in CM2. We need the 0 value because of how we size */
+  /* .CodeMirror-lines */
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+/*
+
+Original style from softwaremaniacs.org (c) Ivan Sagalaev <Maniac@SoftwareManiacs.Org>
+Adapted from GitHub theme
+
+*/
+.highlight-base {
+  color: #000;
+}
+.highlight-variable {
+  color: #000;
+}
+.highlight-variable-2 {
+  color: #1a1a1a;
+}
+.highlight-variable-3 {
+  color: #333333;
+}
+.highlight-string {
+  color: #BA2121;
+}
+.highlight-comment {
+  color: #408080;
+  font-style: italic;
+}
+.highlight-number {
+  color: #080;
+}
+.highlight-atom {
+  color: #88F;
+}
+.highlight-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.highlight-builtin {
+  color: #008000;
+}
+.highlight-error {
+  color: #f00;
+}
+.highlight-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.highlight-meta {
+  color: #AA22FF;
+}
+/* previously not defined, copying from default codemirror */
+.highlight-def {
+  color: #00f;
+}
+.highlight-string-2 {
+  color: #f50;
+}
+.highlight-qualifier {
+  color: #555;
+}
+.highlight-bracket {
+  color: #997;
+}
+.highlight-tag {
+  color: #170;
+}
+.highlight-attribute {
+  color: #00c;
+}
+.highlight-header {
+  color: blue;
+}
+.highlight-quote {
+  color: #090;
+}
+.highlight-link {
+  color: #00c;
+}
+/* apply the same style to codemirror */
+.cm-s-ipython span.cm-keyword {
+  color: #008000;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-atom {
+  color: #88F;
+}
+.cm-s-ipython span.cm-number {
+  color: #080;
+}
+.cm-s-ipython span.cm-def {
+  color: #00f;
+}
+.cm-s-ipython span.cm-variable {
+  color: #000;
+}
+.cm-s-ipython span.cm-operator {
+  color: #AA22FF;
+  font-weight: bold;
+}
+.cm-s-ipython span.cm-variable-2 {
+  color: #1a1a1a;
+}
+.cm-s-ipython span.cm-variable-3 {
+  color: #333333;
+}
+.cm-s-ipython span.cm-comment {
+  color: #408080;
+  font-style: italic;
+}
+.cm-s-ipython span.cm-string {
+  color: #BA2121;
+}
+.cm-s-ipython span.cm-string-2 {
+  color: #f50;
+}
+.cm-s-ipython span.cm-meta {
+  color: #AA22FF;
+}
+.cm-s-ipython span.cm-qualifier {
+  color: #555;
+}
+.cm-s-ipython span.cm-builtin {
+  color: #008000;
+}
+.cm-s-ipython span.cm-bracket {
+  color: #997;
+}
+.cm-s-ipython span.cm-tag {
+  color: #170;
+}
+.cm-s-ipython span.cm-attribute {
+  color: #00c;
+}
+.cm-s-ipython span.cm-header {
+  color: blue;
+}
+.cm-s-ipython span.cm-quote {
+  color: #090;
+}
+.cm-s-ipython span.cm-link {
+  color: #00c;
+}
+.cm-s-ipython span.cm-error {
+  color: #f00;
+}
+.cm-s-ipython span.cm-tab {
+  background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAMCAYAAAAkuj5RAAAAAXNSR0IArs4c6QAAAGFJREFUSMft1LsRQFAQheHPowAKoACx3IgEKtaEHujDjORSgWTH/ZOdnZOcM/sgk/kFFWY0qV8foQwS4MKBCS3qR6ixBJvElOobYAtivseIE120FaowJPN75GMu8j/LfMwNjh4HUpwg4LUAAAAASUVORK5CYII=);
+  background-position: right;
+  background-repeat: no-repeat;
+}
+div.output_wrapper {
+  /* this position must be relative to enable descendents to be absolute within it */
+  position: relative;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  z-index: 1;
+}
+/* class for the output area when it should be height-limited */
+div.output_scroll {
+  /* ideally, this would be max-height, but FF barfs all over that */
+  height: 24em;
+  /* FF needs this *and the wrapper* to specify full width, or it will shrinkwrap */
+  width: 100%;
+  overflow: auto;
+  border-radius: 2px;
+  -webkit-box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  display: block;
+}
+/* output div while it is collapsed */
+div.output_collapsed {
+  margin: 0px;
+  padding: 0px;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+div.out_prompt_overlay {
+  height: 100%;
+  padding: 0px 0.4em;
+  position: absolute;
+  border-radius: 2px;
+}
+div.out_prompt_overlay:hover {
+  /* use inner shadow to get border that is computed the same on WebKit/FF */
+  -webkit-box-shadow: inset 0 0 1px #000;
+  box-shadow: inset 0 0 1px #000;
+  background: rgba(240, 240, 240, 0.5);
+}
+div.output_prompt {
+  color: #D84315;
+}
+/* This class is the outer container of all output sections. */
+div.output_area {
+  padding: 0px;
+  page-break-inside: avoid;
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+div.output_area .MathJax_Display {
+  text-align: left !important;
+}
+div.output_area 
+div.output_area 
+div.output_area img,
+div.output_area svg {
+  max-width: 100%;
+  height: auto;
+}
+div.output_area img.unconfined,
+div.output_area svg.unconfined {
+  max-width: none;
+}
+/* This is needed to protect the pre formating from global settings such
+   as that of bootstrap */
+.output {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: vertical;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: vertical;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.output_area {
+    /* Old browsers */
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-box-align: stretch;
+    display: -moz-box;
+    -moz-box-orient: vertical;
+    -moz-box-align: stretch;
+    display: box;
+    box-orient: vertical;
+    box-align: stretch;
+    /* Modern browsers */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+div.output_area pre {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  vertical-align: baseline;
+  color: black;
+  background-color: transparent;
+  border-radius: 0;
+}
+/* This class is for the output subarea inside the output_area and after
+   the prompt div. */
+div.output_subarea {
+  overflow-x: auto;
+  padding: 0.4em;
+  /* Old browsers */
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  box-flex: 1;
+  /* Modern browsers */
+  flex: 1;
+  max-width: calc(100% - 14ex);
+}
+div.output_scroll div.output_subarea {
+  overflow-x: visible;
+}
+/* The rest of the output_* classes are for special styling of the different
+   output types */
+/* all text output has this class: */
+div.output_text {
+  text-align: left;
+  color: #000;
+  /* This has to match that of the the CodeMirror class line-height below */
+  line-height: 1.21429em;
+}
+/* stdout/stderr are 'text' as well as 'stream', but execute_result/error are *not* streams */
+div.output_stderr {
+  background: #fdd;
+  /* very light red background for stderr */
+}
+div.output_latex {
+  text-align: left;
+}
+/* Empty output_javascript divs should have no height */
+div.output_javascript:empty {
+  padding: 0;
+}
+.js-error {
+  color: darkred;
+}
+/* raw_input styles */
+div.raw_input_container {
+  line-height: 1.21429em;
+  padding-top: 5px;
+}
+pre.raw_input_prompt {
+  /* nothing needed here. */
+}
+input.raw_input {
+  font-family: monospace;
+  font-size: inherit;
+  color: inherit;
+  width: auto;
+  /* make sure input baseline aligns with prompt */
+  vertical-align: baseline;
+  /* padding + margin = 0.5em between prompt and cursor */
+  padding: 0em 0.25em;
+  margin: 0em 0.25em;
+}
+input.raw_input:focus {
+  box-shadow: none;
+}
+p.p-space {
+  margin-bottom: 10px;
+}
+div.output_unrecognized {
+  padding: 5px;
+  font-weight: bold;
+  color: red;
+}
+div.output_unrecognized a {
+  color: inherit;
+  text-decoration: none;
+}
+div.output_unrecognized a:hover {
+  color: inherit;
+  text-decoration: none;
+}
+.rendered_html {
+  color: #000;
+  /* any extras will just be numbers: */
+}
+
+
+
+.rendered_html :link {
+  text-decoration: underline;
+}
+.rendered_html :visited {
+  text-decoration: underline;
+}
+
+
+
+
+
+
+.rendered_html h1:first-child {
+  margin-top: 0.538em;
+}
+.rendered_html h2:first-child {
+  margin-top: 0.636em;
+}
+.rendered_html h3:first-child {
+  margin-top: 0.777em;
+}
+.rendered_html h4:first-child {
+  margin-top: 1em;
+}
+.rendered_html h5:first-child {
+  margin-top: 1em;
+}
+.rendered_html h6:first-child {
+  margin-top: 1em;
+}
+
+
+
+
+
+
+
+
+.rendered_html * + ul {
+  margin-top: 1em;
+}
+.rendered_html * + ol {
+  margin-top: 1em;
+}
+
+
+.rendered_html pre,
+
+
+
+.rendered_html tr,
+.rendered_html th,
+
+.rendered_html td,
+
+
+.rendered_html * + table {
+  margin-top: 1em;
+}
+
+.rendered_html * + p {
+  margin-top: 1em;
+}
+
+.rendered_html * + img {
+  margin-top: 1em;
+}
+.rendered_html img,
+
+.rendered_html img.unconfined,
+
+div.text_cell {
+  /* Old browsers */
+  display: -webkit-box;
+  -webkit-box-orient: horizontal;
+  -webkit-box-align: stretch;
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  -moz-box-align: stretch;
+  display: box;
+  box-orient: horizontal;
+  box-align: stretch;
+  /* Modern browsers */
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+@media (max-width: 540px) {
+  div.text_cell > div.prompt {
+    display: none;
+  }
+}
+div.text_cell_render {
+  /*font-family: "Helvetica Neue", Arial, Helvetica, Geneva, sans-serif;*/
+  outline: none;
+  resize: none;
+  width: inherit;
+  border-style: none;
+  padding: 0.5em 0.5em 0.5em 0.4em;
+  color: #000;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+}
+a.anchor-link:link {
+  text-decoration: none;
+  padding: 0px 20px;
+  visibility: hidden;
+}
+h1:hover .anchor-link,
+h2:hover .anchor-link,
+h3:hover .anchor-link,
+h4:hover .anchor-link,
+h5:hover .anchor-link,
+h6:hover .anchor-link {
+  visibility: visible;
+}
+.text_cell.rendered .input_area {
+  display: none;
+}
+.text_cell.rendered 
+.text_cell.unrendered .text_cell_render {
+  display: none;
+}
+.cm-header-1,
+.cm-header-2,
+.cm-header-3,
+.cm-header-4,
+.cm-header-5,
+.cm-header-6 {
+  font-weight: bold;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+.cm-header-1 {
+  font-size: 185.7%;
+}
+.cm-header-2 {
+  font-size: 157.1%;
+}
+.cm-header-3 {
+  font-size: 128.6%;
+}
+.cm-header-4 {
+  font-size: 110%;
+}
+.cm-header-5 {
+  font-size: 100%;
+  font-style: italic;
+}
+.cm-header-6 {
+  font-size: 100%;
+  font-style: italic;
+}
+</style>
+<style type="text/css">.highlight .hll { background-color: #ffffcc }
+.highlight  { background: #f8f8f8; }
+.highlight .c { color: #408080; font-style: italic } /* Comment */
+.highlight .err { border: 1px solid #FF0000 } /* Error */
+.highlight .k { color: #008000; font-weight: bold } /* Keyword */
+.highlight .o { color: #666666 } /* Operator */
+.highlight .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.highlight .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.highlight .cp { color: #BC7A00 } /* Comment.Preproc */
+.highlight .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.highlight .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.highlight .cs { color: #408080; font-style: italic } /* Comment.Special */
+.highlight .gd { color: #A00000 } /* Generic.Deleted */
+.highlight .ge { font-style: italic } /* Generic.Emph */
+.highlight .gr { color: #FF0000 } /* Generic.Error */
+.highlight .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.highlight .gi { color: #00A000 } /* Generic.Inserted */
+.highlight .go { color: #888888 } /* Generic.Output */
+.highlight .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.highlight .gs { font-weight: bold } /* Generic.Strong */
+.highlight .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.highlight .gt { color: #0044DD } /* Generic.Traceback */
+.highlight .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.highlight .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.highlight .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.highlight .kp { color: #008000 } /* Keyword.Pseudo */
+.highlight .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.highlight .kt { color: #B00040 } /* Keyword.Type */
+.highlight .m { color: #666666 } /* Literal.Number */
+.highlight .s { color: #BA2121 } /* Literal.String */
+.highlight .na { color: #7D9029 } /* Name.Attribute */
+.highlight .nb { color: #008000 } /* Name.Builtin */
+.highlight .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.highlight .no { color: #880000 } /* Name.Constant */
+.highlight .nd { color: #AA22FF } /* Name.Decorator */
+.highlight .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.highlight .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.highlight .nf { color: #0000FF } /* Name.Function */
+.highlight .nl { color: #A0A000 } /* Name.Label */
+.highlight .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.highlight .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.highlight .nv { color: #19177C } /* Name.Variable */
+.highlight .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.highlight .w { color: #bbbbbb } /* Text.Whitespace */
+.highlight .mb { color: #666666 } /* Literal.Number.Bin */
+.highlight .mf { color: #666666 } /* Literal.Number.Float */
+.highlight .mh { color: #666666 } /* Literal.Number.Hex */
+.highlight .mi { color: #666666 } /* Literal.Number.Integer */
+.highlight .mo { color: #666666 } /* Literal.Number.Oct */
+.highlight .sa { color: #BA2121 } /* Literal.String.Affix */
+.highlight .sb { color: #BA2121 } /* Literal.String.Backtick */
+.highlight .sc { color: #BA2121 } /* Literal.String.Char */
+.highlight .dl { color: #BA2121 } /* Literal.String.Delimiter */
+.highlight .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.highlight .s2 { color: #BA2121 } /* Literal.String.Double */
+.highlight .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.highlight .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.highlight .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.highlight .sx { color: #008000 } /* Literal.String.Other */
+.highlight .sr { color: #BB6688 } /* Literal.String.Regex */
+.highlight .s1 { color: #BA2121 } /* Literal.String.Single */
+.highlight .ss { color: #19177C } /* Literal.String.Symbol */
+.highlight .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.highlight .fm { color: #0000FF } /* Name.Function.Magic */
+.highlight .vc { color: #19177C } /* Name.Variable.Class */
+.highlight .vg { color: #19177C } /* Name.Variable.Global */
+.highlight .vi { color: #19177C } /* Name.Variable.Instance */
+.highlight .vm { color: #19177C } /* Name.Variable.Magic */
+.highlight .il { color: #666666 } /* Literal.Number.Integer.Long */</style>
+<style type="text/css">
+/* Temporary definitions which will become obsolete with Notebook release 5.0 */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-bold { font-weight: bold; }
+</style>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Code adapted from <a href="https://github.com/affinelayer/pix2pix-tensorflow">affinelayer's TensorFlow implementation</a>. I would highly recommend checking out <a href="https://github.com/affinelayer/pix2pix-tensorflow">his post</a> for a high-level overview of how the model works. This post is more meant to walk through the code line-by-line.</p>
+<h2 id="Load-Data">Load Data<a class="anchor-link" href="#Load-Data">¶</a></h2><p>First lets load in our data. To start we're going to work with the facades dataset. The input image will be a labeled version of the second picture of a building facade, with different colors representing different features like windows, doors, etc. Our goal will be to produce the second image from the first.</p>
+<p>Unlike prior posts, we're going to use some of TensorFlow's utilities for loading in data. We get our list of files, put them into a queue, and have a <code>WholeFileReader</code> read and decode each. Although this is a bit more cumbersome than using placeholders, from what I've read it can lead to speed up training when working with large amounts of data. It also has the effect of making the loading in of data be a part of the model itself, which is interesting.</p>
+<p><img src="/imgs/ipynb/pix2pix/input_example.jpg" style="display:block;margin:auto"/></p>
+<p>The format of these images is the first half is the target photo, and the second half is the annotated version. We'll preprocess the image to have pixel values between $[-1, 1]$ and then cut it in half, assigning the first part to our target and the second to our input (flipped since we're mapping labeled $\rightarrow$ photo).</p>
+<p>One additional thing we'll do it crop down the images from SCALE_SIZE to CROP_SIZE at a random offset. This is just what the authors describe doing in the paper, however it makes sense as a form of regularization.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="nn">tf</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+
+<span class="c1"># Size to scale to</span>
+<span class="n">SCALE_SIZE</span> <span class="o">=</span> <span class="mi">286</span>
+<span class="c1"># Size to crop to after scaling</span>
+<span class="n">CROP_SIZE</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="k">def</span> <span class="nf">process_image</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">seed</span><span class="p">):</span>
+    <span class="sd">""" Process image to be inputted to model.</span>
+<span class="sd">     Scales pixels to [-1, 1] and crops to CROP_SIZE from SCALE_SIZE randomly.</span>
+<span class="sd">     """</span>
+    <span class="c1"># [0, 1] => [-1, 1]</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span> <span class="o">*</span> <span class="mi">2</span> <span class="o">-</span> <span class="mi">1</span>
+    
+    <span class="c1"># Scale down to SCALE_SIZE</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">resize_images</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">[</span><span class="n">SCALE_SIZE</span><span class="p">,</span> <span class="n">SCALE_SIZE</span><span class="p">],</span> <span class="n">method</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">ResizeMethod</span><span class="o">.</span><span class="n">AREA</span><span class="p">)</span>
+    
+    <span class="c1"># Choose random offset from corner and crop to CROP_SIZE from it</span>
+    <span class="n">offset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_uniform</span><span class="p">([</span><span class="mi">2</span><span class="p">],</span> <span class="mi">0</span><span class="p">,</span> <span class="n">SCALE_SIZE</span> <span class="o">-</span> <span class="n">CROP_SIZE</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">)),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">crop_to_bounding_box</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">offset</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">offset</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">CROP_SIZE</span><span class="p">,</span> <span class="n">CROP_SIZE</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">image</span>
+
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="k">def</span> <span class="nf">load_data</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">""" Loads data from path. """</span>
+    <span class="c1"># All jpgs</span>
+    <span class="n">input_paths</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">'*.jpg'</span><span class="p">))</span>
+
+    <span class="c1"># Data pipeline</span>
+    <span class="n">path_queue</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">string_input_producer</span><span class="p">(</span><span class="n">input_paths</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">reader</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">WholeFileReader</span><span class="p">()</span>
+    <span class="n">paths</span><span class="p">,</span> <span class="n">contents</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">path_queue</span><span class="p">)</span>
+    <span class="n">raw_image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">decode_jpeg</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+    <span class="n">raw_image</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">convert_image_dtype</span><span class="p">(</span><span class="n">raw_image</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">raw_image</span><span class="o">.</span><span class="n">set_shape</span><span class="p">([</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">3</span><span class="p">])</span>
+
+    <span class="c1"># Split image into left and right side</span>
+    <span class="n">width</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">raw_image</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">left</span><span class="p">,</span> <span class="n">right</span> <span class="o">=</span> <span class="n">raw_image</span><span class="p">[:,</span> <span class="p">:</span><span class="n">width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span> <span class="p">:],</span> <span class="n">raw_image</span><span class="p">[:,</span> <span class="n">width</span> <span class="o">//</span> <span class="mi">2</span><span class="p">:,</span> <span class="p">:]</span>
+
+    <span class="c1"># Process image.</span>
+    <span class="c1"># Use same seed for left & right so both get cropped the same</span>
+    <span class="n">seed</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span> <span class="o">**</span> <span class="mi">31</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">left</span> <span class="o">=</span> <span class="n">process_image</span><span class="p">(</span><span class="n">left</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+    <span class="n">right</span> <span class="o">=</span> <span class="n">process_image</span><span class="p">(</span><span class="n">right</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+
+    <span class="c1"># Assign sides to input/target</span>
+    <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">right</span><span class="p">,</span> <span class="n">left</span>
+
+    <span class="c1"># Create batches</span>
+    <span class="n">paths</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">batch</span><span class="p">([</span><span class="n">paths</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">],</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">BATCH_SIZE</span><span class="p">)</span>
+    <span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">input_paths</span><span class="p">)</span> <span class="o">/</span> <span class="n">BATCH_SIZE</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">paths</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">steps_per_epoch</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Some-Helper-Functions">Some Helper Functions<a class="anchor-link" href="#Some-Helper-Functions">¶</a></h2><p>Before we start building the model, there are a couple functions we'll be using that we should define.</p>
+<p>Note that I'm wrapping a lot of these calls with <code>tf.variable_scope</code>. What this does is creates a namespace around the variables we define. This can be important when we have multiple variables with the same name, like "filter" for example, but want them to be distinct parameters when training.</p>
+<h3 id="Conv-&-Deconv">Conv & Deconv<a class="anchor-link" href="#Conv-&-Deconv">¶</a></h3><p>If you're not familiar with Convolution, check out my post on <a href="/posts/cnn-mnist.html">Convolutional Neural Nets</a>. Deconvolution (or Transposed Convolution) was new to me. Normally when performing convolution, we're applying filters in such a way that we decrease the size of our image, effectively downsampling it. Deconvolution does the opposite, upsampling an image to output a larger tensor. There is a lot of debate as what to call this; deconvolution has a well defined meaning from signal processing as the inverse of convolution, which is not what this operation does. Because of this, many people opt to use the name Transposed Convolution instead, which is also what the TensorFlow API does. I'm just going to use <code>deconv</code> in code because it's easier to type.</p>
+<p>What deconvolution ends up looking like is just convolution but with more padding around/between pixels:</p>
+<div style="text-align: center">
+<figure style="display: inline-block;">
+<img src="/imgs/ipynb/pix2pix/conv.gif"/>
+<figcaption>Convolution with Stride 2</figcaption>
+</figure>
+<figure style="display: inline-block;">
+<img src="/imgs/ipynb/pix2pix/deconv.gif"/>
+<figcaption>Deconvolution with Stride 2</figcaption>
+</figure>
+<p>Animations from <a href="https://github.com/vdumoulin/conv_arithmetic">here</a></p>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">conv</span><span class="p">(</span><span class="n">batch_input</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">stride</span><span class="p">):</span>
+    <span class="sd">""" Convolution. """</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"conv"</span><span class="p">):</span>
+        <span class="n">in_channels</span> <span class="o">=</span> <span class="n">batch_input</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">conv_filter</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"filter"</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                                      <span class="n">initializer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal_initializer</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">))</span>
+        <span class="c1"># [batch, in_height, in_width, in_channels], [filter_width, filter_height, in_channels, out_channels]</span>
+        <span class="c1">#     => [batch, out_height, out_width, out_channels]</span>
+        <span class="n">padded_input</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">batch_input</span><span class="p">,</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">mode</span><span class="o">=</span><span class="s2">"CONSTANT"</span><span class="p">)</span>
+        <span class="n">conv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">conv2d</span><span class="p">(</span><span class="n">padded_input</span><span class="p">,</span> <span class="n">conv_filter</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="n">stride</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span> <span class="n">padding</span><span class="o">=</span><span class="s2">"VALID"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">conv</span>
+
+<span class="k">def</span> <span class="nf">deconv</span><span class="p">(</span><span class="n">batch_input</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">):</span>
+    <span class="sd">''' Transposed Convolution. '''</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"deconv"</span><span class="p">):</span>
+        <span class="n">batch</span><span class="p">,</span> <span class="n">in_height</span><span class="p">,</span> <span class="n">in_width</span><span class="p">,</span> <span class="n">in_channels</span> <span class="o">=</span> <span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">batch_input</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()]</span>
+        <span class="n">deconv_filter</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"filter"</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">in_channels</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                                        <span class="n">initializer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal_initializer</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">))</span>
+        <span class="c1"># [batch, in_height, in_width, in_channels], [filter_width, filter_height, out_channels, in_channels]</span>
+        <span class="c1">#     => [batch, out_height, out_width, out_channels]</span>
+        <span class="n">deconv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">conv2d_transpose</span><span class="p">(</span><span class="n">batch_input</span><span class="p">,</span>
+                                        <span class="n">deconv_filter</span><span class="p">,</span>
+                                        <span class="p">[</span><span class="n">batch</span><span class="p">,</span> <span class="n">in_height</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">in_width</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">],</span>
+                                        <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+                                        <span class="n">padding</span><span class="o">=</span><span class="s2">"SAME"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">deconv</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Leaky-ReLU">Leaky ReLU<a class="anchor-link" href="#Leaky-ReLU">¶</a></h3><p>Leaky ReLU is a variation of normal ReLU that helps prevent dead neurons. With ReLU, values less than 0 are set to 0, and have no gradient. This creates the problem where a neuron can start always outputting 0 for any input and once in that state, can't get out of it since there is no gradient to go up. Leaky ReLU tries to fix this by having values less than zero have a slight negative slope, equivalent to the following:</p>
+\begin{align*}
+\operatorname{ReLU}(x) &= \max(0,x) \\
+\operatorname{LReLU}(x,a) &= \frac{1+a}{2}x + \frac{1-a}{2} \vert x \vert  \\
+&= \begin{cases}
+    x,&  x \geq 0\\
+    ax,& x < 0
+\end{cases}
+\end{align*}<div style="text-align:center">
+<img src="/imgs/ipynb/pix2pix/relu.png" style="margin: 5px; border: 1px solid black; display: inline-block; width: 30%"/><img src="/imgs/ipynb/pix2pix/lrelu.png" style="margin: 5px; border: 1px solid black; display: inline-block; width: 30%"/></div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">lrelu</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">a</span><span class="p">):</span>
+    <span class="sd">''' Leaky ReLU.</span>
+<span class="sd">        x is our tensor.</span>
+<span class="sd">        a is the magnitude of negative slope for x < 0.</span>
+<span class="sd">    '''</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">a</span><span class="p">))</span> <span class="o">*</span> <span class="n">x</span> <span class="o">+</span> <span class="p">(</span><span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">a</span><span class="p">))</span> <span class="o">*</span> <span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Batch-Normalization">Batch Normalization<a class="anchor-link" href="#Batch-Normalization">¶</a></h3><p>Batch Normalization is a cool general technique for improving training. All it does is normalize the input to a layer for mean and variance, while also including a trainable bias and scale parameter that allows the amount of normalization to be adjusted. From <a href="https://arxiv.org/pdf/1502.03167.pdf">the paper</a> where it was introduced:</p>
+<p><img src="/imgs/ipynb/pix2pix/batchnorm.png" style="width: 40%; display: block; margin: auto;"/></p>
+<p>If $\gamma \approx \sigma$ and $\beta \approx \mu$ then the transformation becomes an identity, allowing the NN to disable the behavior if not beneficial. In general, however, it allows for higher learning rates, reduces the need for dropout as it has a regularizing effect, and reduces dependence on initialization.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">batchnorm</span><span class="p">(</span><span class="n">inp</span><span class="p">):</span>
+    <span class="sd">''' Batch Normalization. '''</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"batchnorm"</span><span class="p">):</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="n">inp</span><span class="o">.</span><span class="n">get_shape</span><span class="p">()[</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">offset</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"offset"</span><span class="p">,</span>
+                                 <span class="p">[</span><span class="n">channels</span><span class="p">],</span>
+                                 <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                                 <span class="n">initializer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">zeros_initializer</span><span class="p">())</span>
+        <span class="n">scale</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s2">"scale"</span><span class="p">,</span>
+                                <span class="p">[</span><span class="n">channels</span><span class="p">],</span>
+                                <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                                <span class="n">initializer</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal_initializer</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">))</span>
+
+        <span class="n">mean</span><span class="p">,</span> <span class="n">variance</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">moments</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">axes</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="n">keep_dims</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">variance_epsilon</span> <span class="o">=</span> <span class="mf">1e-5</span>
+        <span class="n">normalized</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">batch_normalization</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">mean</span><span class="p">,</span> <span class="n">variance</span><span class="p">,</span>
+                                               <span class="n">offset</span><span class="p">,</span> <span class="n">scale</span><span class="p">,</span> <span class="n">variance_epsilon</span><span class="o">=</span><span class="n">variance_epsilon</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">normalized</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Now with that out of the way, lets get to actually building our model. Like all GAN architectures, our model will have a generator and discriminator. Let's start with the generator.</p>
+<h2 id="Generator">Generator<a class="anchor-link" href="#Generator">¶</a></h2><figure>
+<img src="/imgs/ipynb/pix2pix/generator.png" style="width: 100%;"/>
+<img src="/imgs/ipynb/pix2pix/units.png" style="display:block;width:50%;margin:auto;"/>
+<figcaption style="text-align:center">Images from <a href="https://affinelayer.com/pix2pix/">affinelayer</a></figcaption>
+</figure><p>The generator is made up of a series of convolution layers, followed by a series of deconvolution layers. This has an effect similar to an autoencoder, where the model is forced to compress the 256x256x3 image into a single 1x1x256 vector keeping only the most important parts of the image before upsampling it again with the deconvolution layers. However, often with these image-to-image translation tasks larger structural features are the same in both input and target, so the model has skip layers where layers from the convolution are inputted into their opposite deconvolution layer, allowing this information to transfer.</p>
+<p>Each layer in the encoder gets leaky ReLU and and decoder layers get normal ReLU and dropout. Both get batch normalization.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Num of generator filters</span>
+<span class="n">NGF</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="k">def</span> <span class="nf">create_generator</span><span class="p">(</span><span class="n">generator_inputs</span><span class="p">):</span>
+    <span class="sd">""" Create generator network. """</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1">### ENCODER ###</span>
+
+    <span class="c1"># encoder 1: [batch, 256, 256, 3] => [batch, 128, 128, NGF]</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"encoder_1"</span><span class="p">):</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">generator_inputs</span><span class="p">,</span> <span class="n">NGF</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="n">layer_specs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">NGF</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span>  <span class="c1"># encoder 2: [batch, 128, 128, ngf] => [batch, 64, 64, ngf * 2]</span>
+        <span class="n">NGF</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span>  <span class="c1"># encoder 3: [batch, 64, 64, ngf * 2] => [batch, 32, 32, ngf * 4]</span>
+        <span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># encoder 4: [batch, 32, 32, ngf * 4] => [batch, 16, 16, ngf * 8]</span>
+        <span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># encoder 5: [batch, 16, 16, ngf * 8] => [batch, 8, 8, ngf * 8]</span>
+        <span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># encoder 6: [batch, 8, 8, ngf * 8] => [batch, 4, 4, ngf * 8]</span>
+        <span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># encoder 7: [batch, 4, 4, ngf * 8] => [batch, 2, 2, ngf * 8]</span>
+        <span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span>  <span class="c1"># encoder 8: [batch, 2, 2, ngf * 8] => [batch, 1, 1, ngf * 8]</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">out_channels</span> <span class="ow">in</span> <span class="n">layer_specs</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"encoder_</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">rectified</span> <span class="o">=</span> <span class="n">lrelu</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="mf">0.2</span><span class="p">)</span>
+            <span class="n">convolved</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">rectified</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">batchnorm</span><span class="p">(</span><span class="n">convolved</span><span class="p">)</span>
+            <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="c1">### DECODER ###</span>
+
+    <span class="c1"># (channels, dropout probability)</span>
+    <span class="n">layer_specs</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>  <span class="c1"># decoder 8: [batch, 1, 1, ngf * 8] => [batch, 2, 2, ngf * 8 * 2]</span>
+        <span class="p">(</span><span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>  <span class="c1"># decoder 7: [batch, 2, 2, ngf * 8 * 2] => [batch, 4, 4, ngf * 8 * 2]</span>
+        <span class="p">(</span><span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">),</span>  <span class="c1"># decoder 6: [batch, 4, 4, ngf * 8 * 2] => [batch, 8, 8, ngf * 8 * 2]</span>
+        <span class="p">(</span><span class="n">NGF</span> <span class="o">*</span> <span class="mi">8</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># decoder 5: [batch, 8, 8, ngf * 8 * 2] => [batch, 16, 16, ngf * 8 * 2]</span>
+        <span class="p">(</span><span class="n">NGF</span> <span class="o">*</span> <span class="mi">4</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># decoder 4: [batch, 16, 16, ngf * 8 * 2] => [batch, 32, 32, ngf * 4 * 2]</span>
+        <span class="p">(</span><span class="n">NGF</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># decoder 3: [batch, 32, 32, ngf * 4 * 2] => [batch, 64, 64, ngf * 2 * 2]</span>
+        <span class="p">(</span><span class="n">NGF</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">),</span>  <span class="c1"># decoder 2: [batch, 64, 64, ngf * 2 * 2] => [batch, 128, 128, ngf * 2]</span>
+    <span class="p">]</span>
+
+    <span class="n">num_encoder_layers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">decoder_layer</span><span class="p">,</span> <span class="p">(</span><span class="n">out_channels</span><span class="p">,</span> <span class="n">dropout</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">layer_specs</span><span class="p">):</span>
+        <span class="c1"># Encoder layer to concat with to create skip connection</span>
+        <span class="n">skip_layer</span> <span class="o">=</span> <span class="n">num_encoder_layers</span> <span class="o">-</span> <span class="n">decoder_layer</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"decoder_</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">skip_layer</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="n">decoder_layer</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># First decoder layer doesn't have skip connections</span>
+                <span class="n">inp</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">layers</span><span class="p">[</span><span class="n">skip_layer</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+            <span class="n">rectified</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">deconv</span><span class="p">(</span><span class="n">rectified</span><span class="p">,</span> <span class="n">out_channels</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">batchnorm</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">dropout</span> <span class="o">></span> <span class="mf">0.0</span><span class="p">:</span>
+                <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">keep_prob</span><span class="o">=</span><span class="mi">1</span> <span class="o">-</span> <span class="n">dropout</span><span class="p">)</span>
+
+            <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="c1"># decoder 1: [batch, 128, 128, ngf * 2] => [batch, 256, 256, 3]</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"decoder_1"</span><span class="p">):</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">layers</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="n">rectified</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">deconv</span><span class="p">(</span><span class="n">rectified</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">tanh</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Discriminator">Discriminator<a class="anchor-link" href="#Discriminator">¶</a></h2><figure>
+<img src="/imgs/ipynb/pix2pix/discriminator.png" style="width: 100%"/>
+<figcaption style="text-align:center">Image from <a href="https://affinelayer.com/pix2pix/">affinelayer</a></figcaption>
+</figure><p>Next up is our discriminator, which is a lot simpler than the generator. The discriminator receives an input (a labeled facade in this case) and a generated or real output for that input that it has to gauge the legitimacy of. It is made up of a series of convolutions outputting a single probability of being "real" from a sigmoid at the end. Each layer gets batch normalization and leaky ReLU.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Number of discriminator filters</span>
+<span class="n">NDF</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="k">def</span> <span class="nf">create_discriminator</span><span class="p">(</span><span class="n">discrim_inputs</span><span class="p">,</span> <span class="n">discrim_targets</span><span class="p">):</span>
+    <span class="n">n_layers</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">layers</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># 2x [batch, height, width, 3] => [batch, height, width, 6]</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">discrim_inputs</span><span class="p">,</span> <span class="n">discrim_targets</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+
+    <span class="c1"># layer 1: [batch, 256, 256, 6] => [batch, 128, 128, ndf]</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"layer_1"</span><span class="p">):</span>
+        <span class="n">convolved</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">NDF</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">rectified</span> <span class="o">=</span> <span class="n">lrelu</span><span class="p">(</span><span class="n">convolved</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rectified</span><span class="p">)</span>
+
+    <span class="c1"># layer 2: [batch, 128, 128, ndf] => [batch, 64, 64, ndf * 2]</span>
+    <span class="c1"># layer 3: [batch, 64, 64, ndf * 2] => [batch, 32, 32, ndf * 4]</span>
+    <span class="c1"># layer 4: [batch, 32, 32, ndf * 4] => [batch, 31, 31, ndf * 8]</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_layers</span><span class="p">):</span>
+        <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"layer_</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+            <span class="n">out_channels</span> <span class="o">=</span> <span class="n">NDF</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="n">stride</span> <span class="o">=</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="n">n_layers</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="mi">2</span>  <span class="c1"># Last layer here has stride 1</span>
+            <span class="n">convolved</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">out_channels</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="n">stride</span><span class="p">)</span>
+            <span class="n">normalized</span> <span class="o">=</span> <span class="n">batchnorm</span><span class="p">(</span><span class="n">convolved</span><span class="p">)</span>
+            <span class="n">rectified</span> <span class="o">=</span> <span class="n">lrelu</span><span class="p">(</span><span class="n">normalized</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">)</span>
+            <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rectified</span><span class="p">)</span>
+
+    <span class="c1"># layer_5: [batch, 31, 31, ndf * 8] => [batch, 30, 30, 1]</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"layer_</span><span class="si">{}</span><span class="s2">"</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">layers</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)):</span>
+        <span class="n">convolved</span> <span class="o">=</span> <span class="n">conv</span><span class="p">(</span><span class="n">rectified</span><span class="p">,</span> <span class="n">out_channels</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">stride</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">sigmoid</span><span class="p">(</span><span class="n">convolved</span><span class="p">)</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Loss-&-Optimizer">Loss & Optimizer<a class="anchor-link" href="#Loss-&-Optimizer">¶</a></h2><p>The discriminator's loss is simple, just minimize giving the wrong label, similar to a normal GAN.</p>
+<p>For the generator, we have two losses. The first is the standard GAN loss, try to minimize the discriminator detecting that the generated image is fake. The second loss is an L1 loss that tries to minimize the differences between generated and target image, since they should be as similar as possible. L2 loss is also sometimes used here, but the paper notes L1 loss produces less blurring. We then linearly combine these two losses to get our total generator loss.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Val used to prevent 0 erros in log</span>
+<span class="n">EPS</span> <span class="o">=</span> <span class="mf">1e-12</span>
+<span class="c1"># Weights for the two GAN losses</span>
+<span class="n">GAN_WEIGHT</span> <span class="o">=</span> <span class="mf">1.</span>
+<span class="n">L1_WEIGHT</span> <span class="o">=</span> <span class="mf">100.</span>
+<span class="c1"># Optimizer params</span>
+<span class="n">LR</span> <span class="o">=</span> <span class="mf">0.0002</span>
+<span class="n">BETA1</span> <span class="o">=</span> <span class="mf">0.5</span>
+<span class="k">def</span> <span class="nf">build_model</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"generator"</span><span class="p">):</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">create_generator</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"discriminator"</span><span class="p">):</span>
+        <span class="n">predict_real</span> <span class="o">=</span> <span class="n">create_discriminator</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s2">"discriminator"</span><span class="p">,</span> <span class="n">reuse</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="n">predict_fake</span> <span class="o">=</span> <span class="n">create_discriminator</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">outputs</span><span class="p">)</span>
+
+    <span class="c1"># Discriminator loss</span>
+    <span class="n">discrim_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">predict_real</span> <span class="o">+</span> <span class="n">EPS</span><span class="p">)</span> <span class="o">+</span> <span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">predict_fake</span> <span class="o">+</span> <span class="n">EPS</span><span class="p">)))</span>
+
+    <span class="c1"># Generator loss</span>
+    <span class="n">gen_loss_gan</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="o">-</span><span class="n">tf</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">predict_fake</span> <span class="o">+</span> <span class="n">EPS</span><span class="p">))</span>
+    <span class="n">gen_loss_l1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">targets</span> <span class="o">-</span> <span class="n">outputs</span><span class="p">))</span>
+    <span class="n">gen_loss</span> <span class="o">=</span> <span class="n">gen_loss_gan</span> <span class="o">*</span> <span class="n">GAN_WEIGHT</span> <span class="o">+</span> <span class="n">gen_loss_l1</span> <span class="o">*</span> <span class="n">L1_WEIGHT</span>
+
+    <span class="c1"># Discriminator train op</span>
+    <span class="n">discrim_tvars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"discriminator"</span><span class="p">)]</span>
+    <span class="n">discrim_optim</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">LR</span><span class="p">,</span> <span class="n">BETA1</span><span class="p">)</span>
+    <span class="n">discrim_grads_and_vars</span> <span class="o">=</span> <span class="n">discrim_optim</span><span class="o">.</span><span class="n">compute_gradients</span><span class="p">(</span><span class="n">discrim_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">discrim_tvars</span><span class="p">)</span>
+    <span class="n">discrim_train</span> <span class="o">=</span> <span class="n">discrim_optim</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="n">discrim_grads_and_vars</span><span class="p">)</span>
+
+    <span class="c1"># Generator train op</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="o">.</span><span class="n">control_dependencies</span><span class="p">([</span><span class="n">discrim_train</span><span class="p">]):</span>
+        <span class="n">gen_tvars</span> <span class="o">=</span> <span class="p">[</span><span class="n">var</span> <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">tf</span><span class="o">.</span><span class="n">trainable_variables</span><span class="p">()</span> <span class="k">if</span> <span class="n">var</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">"generator"</span><span class="p">)]</span>
+        <span class="n">gen_optim</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">LR</span><span class="p">,</span> <span class="n">BETA1</span><span class="p">)</span>
+        <span class="n">gen_grads_and_vars</span> <span class="o">=</span> <span class="n">gen_optim</span><span class="o">.</span><span class="n">compute_gradients</span><span class="p">(</span><span class="n">gen_loss</span><span class="p">,</span> <span class="n">var_list</span><span class="o">=</span><span class="n">gen_tvars</span><span class="p">)</span>
+        <span class="n">gen_train</span> <span class="o">=</span> <span class="n">gen_optim</span><span class="o">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="n">gen_grads_and_vars</span><span class="p">)</span>
+
+    <span class="c1"># Decay gradient over time</span>
+    <span class="n">ema</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">ExponentialMovingAverage</span><span class="p">(</span><span class="n">decay</span><span class="o">=</span><span class="mf">0.99</span><span class="p">)</span>
+    <span class="n">update_losses</span> <span class="o">=</span> <span class="n">ema</span><span class="o">.</span><span class="n">apply</span><span class="p">([</span><span class="n">discrim_loss</span><span class="p">,</span> <span class="n">gen_loss_gan</span><span class="p">,</span> <span class="n">gen_loss_l1</span><span class="p">])</span>
+
+    <span class="c1"># Incrementing global step</span>
+    <span class="n">global_step</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">contrib</span><span class="o">.</span><span class="n">framework</span><span class="o">.</span><span class="n">get_or_create_global_step</span><span class="p">()</span>
+    <span class="n">incr_global_step</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">assign</span><span class="p">(</span><span class="n">global_step</span><span class="p">,</span> <span class="n">global_step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># We don't include discrim_train in the group bb it's a dependency of gen_train</span>
+    <span class="n">train_op</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="n">update_losses</span><span class="p">,</span> <span class="n">incr_global_step</span><span class="p">,</span> <span class="n">gen_train</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">train_op</span><span class="p">,</span> <span class="n">gen_loss</span><span class="p">,</span> <span class="n">discrim_loss</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Train">Train<a class="anchor-link" href="#Train">¶</a></h2><p>Training is pretty straightforward, however, one thing to note here is that unlike prior models I've written up this definitely requires a GPU if you're going to do the full 200 epochs, or you'll be waiting a while.</p>
+<p>Instead of a normal <code>Session</code> we'll use a <code>managed_session</code> which handles initialization & other bookkeeping.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">time</span>
+
+<span class="c1"># How often to print progress/save</span>
+<span class="n">PROG_F</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">SAVE_F</span> <span class="o">=</span> <span class="mi">5000</span>
+
+<span class="n">MAX_EPOCHS</span> <span class="o">=</span> <span class="mi">200</span>
+<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="s1">'out'</span>
+<span class="k">def</span> <span class="nf">train</span><span class="p">(</span><span class="n">train_op</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">gen_loss</span><span class="p">,</span> <span class="n">discrim_loss</span><span class="p">,</span> <span class="n">steps_per_epoch</span><span class="p">):</span>
+    <span class="sd">""" Train model. """</span>
+    <span class="n">max_steps</span> <span class="o">=</span> <span class="n">MAX_EPOCHS</span> <span class="o">*</span> <span class="n">steps_per_epoch</span>
+    <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">(</span><span class="n">max_to_keep</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Supervisor</span><span class="p">(</span><span class="n">logdir</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span> <span class="n">save_summaries_secs</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">saver</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">sv</span><span class="o">.</span><span class="n">managed_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_steps</span><span class="p">):</span>
+            <span class="k">def</span> <span class="nf">should</span><span class="p">(</span><span class="n">freq</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">freq</span> <span class="o">></span> <span class="mi">0</span> <span class="ow">and</span> <span class="p">((</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">freq</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">step</span> <span class="o">==</span> <span class="n">max_steps</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+
+            <span class="n">fetches</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">"train"</span><span class="p">:</span> <span class="n">train_op</span><span class="p">,</span>
+                <span class="s2">"global_step"</span><span class="p">:</span> <span class="n">sv</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+            <span class="p">}</span>
+
+            <span class="k">if</span> <span class="n">should</span><span class="p">(</span><span class="n">PROG_F</span><span class="p">):</span>
+                <span class="n">fetches</span><span class="p">[</span><span class="s2">"discrim_loss"</span><span class="p">]</span> <span class="o">=</span> <span class="n">discrim_loss</span>
+                <span class="n">fetches</span><span class="p">[</span><span class="s2">"gen_loss"</span><span class="p">]</span> <span class="o">=</span> <span class="n">gen_loss</span>
+
+            <span class="n">results</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">fetches</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">should</span><span class="p">(</span><span class="n">PROG_F</span><span class="p">):</span>
+                <span class="n">train_epoch</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">"global_step"</span><span class="p">]</span> <span class="o">/</span> <span class="n">steps_per_epoch</span><span class="p">)</span>
+                <span class="n">train_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">"global_step"</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">steps_per_epoch</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">rate</span> <span class="o">=</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">BATCH_SIZE</span> <span class="o">/</span> <span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
+                <span class="n">remaining</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_steps</span> <span class="o">-</span> <span class="n">step</span><span class="p">)</span> <span class="o">*</span> <span class="n">BATCH_SIZE</span> <span class="o">/</span> <span class="n">rate</span>
+                <span class="nb">print</span><span class="p">((</span><span class="s2">"progress  "</span> <span class="o">+</span>
+                       <span class="s2">"epoch </span><span class="si">{}</span><span class="s2">  "</span> <span class="o">+</span>
+                       <span class="s2">"step </span><span class="si">{}</span><span class="s2">  "</span> <span class="o">+</span>
+                       <span class="s2">"image/sec </span><span class="si">{:0.1f}</span><span class="s2"> "</span> <span class="o">+</span>
+                       <span class="s2">"remaining </span><span class="si">{}</span><span class="s2">m"</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">train_epoch</span><span class="p">,</span> <span class="n">train_step</span><span class="p">,</span> <span class="n">rate</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">remaining</span> <span class="o">/</span> <span class="mi">60</span><span class="p">)))</span>
+
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"discrim_loss"</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="s2">"discrim_loss"</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"gen_loss_GAN"</span><span class="p">,</span> <span class="n">results</span><span class="p">[</span><span class="s2">"gen_loss"</span><span class="p">])</span>
+
+            <span class="k">if</span> <span class="n">should</span><span class="p">(</span><span class="n">SAVE_F</span><span class="p">):</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">"saving model"</span><span class="p">)</span>
+                <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">,</span> <span class="s2">"model"</span><span class="p">),</span> <span class="n">global_step</span><span class="o">=</span><span class="n">sv</span><span class="o">.</span><span class="n">global_step</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">sv</span><span class="o">.</span><span class="n">should_stop</span><span class="p">():</span>
+                <span class="k">break</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">,</span> <span class="s2">"model"</span><span class="p">),</span> <span class="n">global_step</span><span class="o">=</span><span class="n">sv</span><span class="o">.</span><span class="n">global_step</span><span class="p">)</span>
+
+<span class="n">paths</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'data/pix2pix/facades/train'</span><span class="p">)</span>
+<span class="n">outputs</span><span class="p">,</span> <span class="n">train_op</span><span class="p">,</span> <span class="n">gen_loss</span><span class="p">,</span> <span class="n">discrim_loss</span> <span class="o">=</span> <span class="n">build_model</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+<span class="n">train</span><span class="p">(</span><span class="n">train_op</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">gen_loss</span><span class="p">,</span> <span class="n">discrim_loss</span><span class="p">,</span> <span class="n">steps_per_epoch</span><span class="p">)</span>
+<span class="n">OUT_DIR</span> <span class="o">=</span> <span class="s1">'out'</span>
+<span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Evaluating">Evaluating<a class="anchor-link" href="#Evaluating">¶</a></h2><p>Because of the way we're feeding in data, evaluating is a little different. We'll clear out everything, remake our model with the <code>val</code> data as input instead, and load in our trained parameters. From there, running is exactly the same except now we write out the images produced.</p>
+<p>Note: You can't define the model twice, so don't run the <code>train</code> cell above followed by this one. You have to start fresh and choose one or the other. I'm brushing that aside for general clarity of this post, but check out the full code if you actually want to run this.</p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">OUT_DIR</span> <span class="o">=</span> <span class="s1">'out'</span>
+<span class="k">def</span> <span class="nf">save_images</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
+    <span class="sd">""" Save images from results. """</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">in_path</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">"paths"</span><span class="p">]):</span>
+        <span class="n">num</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">in_path</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">'utf8'</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">kind</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">"inputs"</span><span class="p">,</span> <span class="s2">"outputs"</span><span class="p">,</span> <span class="s2">"targets"</span><span class="p">]:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">f</span><span class="s2">"</span><span class="si">{num}</span><span class="s2">-</span><span class="si">{kind}</span><span class="s2">.png"</span>
+            <span class="n">out_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">image_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">contents</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="n">kind</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="s2">"wb"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">deprocess_image</span><span class="p">(</span><span class="n">img</span><span class="p">):</span>
+    <span class="sd">''' Turn output pixel values back into a normal image. '''</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="p">(</span><span class="n">img</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">convert_image_dtype</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span> <span class="n">saturate</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                
+<span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">steps_per_epoch</span><span class="p">):</span>
+    <span class="sd">""" Evaluate model on test images. """</span>
+    <span class="n">output_images</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">"paths"</span><span class="p">:</span> <span class="n">paths</span><span class="p">,</span>
+        <span class="s2">"inputs"</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">map_fn</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">encode_png</span><span class="p">,</span> <span class="n">deprocess_image</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">string</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"inputs_pngs"</span><span class="p">),</span>
+        <span class="s2">"targets"</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">map_fn</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">encode_png</span><span class="p">,</span> <span class="n">deprocess_image</span><span class="p">(</span><span class="n">targets</span><span class="p">),</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">string</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"target_pngs"</span><span class="p">),</span>
+        <span class="s2">"outputs"</span><span class="p">:</span> <span class="n">tf</span><span class="o">.</span><span class="n">map_fn</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">encode_png</span><span class="p">,</span> <span class="n">deprocess_image</span><span class="p">(</span><span class="n">outputs</span><span class="p">),</span>
+                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">string</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">"output_pngs"</span><span class="p">),</span>
+    <span class="p">}</span>
+
+    <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Saver</span><span class="p">()</span>
+    <span class="n">sv</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">Supervisor</span><span class="p">(</span><span class="n">logdir</span><span class="o">=</span><span class="n">OUT_DIR</span><span class="p">,</span> <span class="n">save_summaries_secs</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">saver</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">sv</span><span class="o">.</span><span class="n">managed_session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="c1"># Restore from checkpoint</span>
+        <span class="n">checkpoint</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">train</span><span class="o">.</span><span class="n">latest_checkpoint</span><span class="p">(</span><span class="n">OUT_DIR</span><span class="p">)</span>
+        <span class="n">saver</span><span class="o">.</span><span class="n">restore</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">)</span>
+        <span class="c1"># Save outputs</span>
+        <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps_per_epoch</span><span class="p">):</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="n">sess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">output_images</span><span class="p">)</span>
+            <span class="n">save_images</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+
+<span class="n">paths</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="n">load_data</span><span class="p">(</span><span class="s1">'data/pix2pix/facades/val'</span><span class="p">)</span>
+<span class="n">outputs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">build_model</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">)</span>
+<span class="n">test</span><span class="p">(</span><span class="n">paths</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">targets</span><span class="p">,</span> <span class="n">outputs</span><span class="p">,</span> <span class="n">steps_per_epoch</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Results">Results<a class="anchor-link" href="#Results">¶</a></h2><table>
+<thead><tr>
+<th>Input</th>
+<th>Generated</th>
+<th>Target</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><img src="/imgs/ipynb/pix2pix/results/1-inputs.png"/></td>
+<td><img src="/imgs/ipynb/pix2pix/results/1-outputs.png"/></td>
+<td><img src="/imgs/ipynb/pix2pix/results/1-targets.png"/></td>
+</tr>
+<tr>
+<td><img src="/imgs/ipynb/pix2pix/results/2-inputs.png"/></td>
+<td><img src="/imgs/ipynb/pix2pix/results/2-outputs.png"/></td>
+<td><img src="/imgs/ipynb/pix2pix/results/2-targets.png"/></td>
+</tr>
+<tr>
+<td><img src="/imgs/ipynb/pix2pix/results/3-inputs.png"/></td>
+<td><img src="/imgs/ipynb/pix2pix/results/3-outputs.png"/></td>
+<td><img src="/imgs/ipynb/pix2pix/results/3-targets.png"/></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+<div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = '//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: 'center'," +
+        "    displayIndent: '0em'," +
+        "    showMathMenu: true," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['$','$'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }" +
+        "    } " +
+        "}); ";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+
+	        
+        </div>
+    </div>
+    
+    <div class="row tags">
+        <div class="col">
+        Tags: 
+            <a class='tag' href="/tags/deep-learning.html">deep-learning</a>
+        
+            <a class='tag' href="/tags/image-translation.html">image-translation</a>
+        
+            <a class='tag' href="/tags/GAN.html">GAN</a>
+        
+            <a class='tag' href="/tags/pix2pix.html">pix2pix</a>
+        
+            <a class='tag' href="/tags/SoT.html">SoT</a>
+        
+        </div>
+    </div>
+
+    
+    <div id="disqus_thread"></div>
+    <script>
+    var disqus_config = function () {
+    this.page.identifier = 'pix2pix';
+    };
+    (function() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://wpovell.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    (d.head || d.body).appendChild(s);
+    })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    
+</div>
+
+
+        </div>
+    </div>
+</div>
+</body>
+</html>
