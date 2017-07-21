@@ -1,6 +1,6 @@
 title: Image to Image Translation with pix2pix
 tags: deep-learning,image-translation,GAN,pix2pix,SoT
-time: 19-7-16 8:00PM
+time: 19-7-21 1:00AM
 slug: pix2pix
 ipython: ipynb/pix2pix.ipynb
 

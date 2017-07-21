@@ -1,10 +1,8 @@
-title: Building a PC for Deep Learning
-tags: pc-build,deep-learning
+title: First PC Build
+tags: pc-build
 time: 19-7-23 8:00PM
 slug: pc-build
 hide:
-
-
 
 
 ## Parts List
