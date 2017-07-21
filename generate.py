@@ -162,8 +162,8 @@ def copyStatic():
 	dir_util.copy_tree('dev', OUT_DIR)
 
 def sot(post):
-	toInsert = '''<em>This post is a part of my
-	<a href="/posts/summer-of-tensorflow.html">Summer of Tensorflow</a> series.</em>\n\n'''
+	toInsert = '''☀️  <em>This post is a part of my
+	<a href="/posts/summer-of-tensorflow.html">Summer of Tensorflow</a> series</em> ☀️ \n\n'''
 	if 'SoT' in post.tags and post.slug != 'summer-of-tensorflow':
 			post.body = toInsert + post.body
 
