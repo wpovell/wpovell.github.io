@@ -50,7 +50,7 @@
     <div class="row">
         <div class="post col">
         	
-				<p>One cool application of <a href="/posts/gan-mnist.html">GANs</a> is image translation. The task is given pairs of images, can you learn to generate the output image from an input. Examples of this task would be turning satelite images into maps or coloring black and white photos. In this post we're going to walk through the <a href="https://arxiv.org/abs/1611.07004">pix2pix model by Isola et al.</a></p>
+				<p>One cool application of <a href="/posts/gan-mnist.html">GANs</a> is image translation. The task is given pairs of images, can you learn to generate the output image from an input. Examples of this task would be turning satelite images into maps or coloring black and white photos. In this post we’re going to walk through the <a href="https://arxiv.org/abs/1611.07004">pix2pix model by Isola et al.</a></p>
 <figure>
 <img style="width: 70%; display: block; margin:auto;" src="/imgs/ipynb/pix2pix/trans.jpg">
 <figcaption style="text-align:center">
@@ -106,9 +106,9 @@ Image from the <a href="https://arxiv.org/abs/1611.07004">pix2pix paper</a>
     <div class="row">
         <div class="post col">
         	
-				<p><a href="http://hackmit.org">HackMIT</a> opened its registration recently and as a tradition offered a series of admission puzzles. There were five total involving various CS topics, including crypto and machine learning. The last puzzle was definitely my favorite so I thought I'd walk through my solution. The challenge was as follows: Given a CAPTCHA like</p>
+				<p><a href="http://hackmit.org">HackMIT</a> opened its registration recently and as a tradition offered a series of admission puzzles. There were five total involving various CS topics, including crypto and machine learning. The last puzzle was definitely my favorite so I thought I’d walk through my solution. The challenge was as follows: Given a CAPTCHA like</p>
 <p><img style='display:block;margin: auto;width: 30%' src="/imgs/captcha.png"></p>
-<p>find the solution text. You could request as many images as you'd like, you just had to return 15k solutions with at least 10k correct (~66% accuracy). It was suggested that there was a deterministic way to get the CAPTCHAs from the IDs, however I went with the more straightword ML route.</p>
+<p>find the solution text. You could request as many images as you’d like, you just had to return 15k solutions with at least 10k correct (~66% accuracy). It was suggested that there was a deterministic way to get the CAPTCHAs from the IDs, however I went with the more straightword ML route.</p>
 
 	        
         </div>
@@ -154,7 +154,7 @@ Image from the <a href="https://arxiv.org/abs/1611.07004">pix2pix paper</a>
     <div class="row">
         <div class="post col">
         	
-				<p>This post will walk through training a pong AI using policy gradients, a type of reenforcement learning. This model continually plays against a hard coded AI, using a neural net to decide on the move it makes. As it plays, it's actions are rewarded if they produce a score and discouraged if the opponent scores. Over time the idea is that the AI's move will become better and better as good play is encouraged.</p>
+				<p>This post will walk through training a pong AI using policy gradients, a type of reenforcement learning. This model continually plays against a hard coded AI, using a neural net to decide on the move it makes. As it plays, it’s actions are rewarded if they produce a score and discouraged if the opponent scores. Over time the idea is that the AI’s move will become better and better as good play is encouraged.</p>
 <video style="width: 20%;display: block;margin: auto;" autoplay loop>
 <source src="/imgs/ipynb/pong_movie.mp4" type="video/mp4"/>
 </video>
@@ -205,7 +205,7 @@ Image from the <a href="https://arxiv.org/abs/1611.07004">pix2pix paper</a>
     <div class="row">
         <div class="post col">
         	
-				<p>This post will walk through creating a Conditional Generative Adversarial Network (CGAN) to generate MNIST digits. The model works by having one neural net that generates an image, and another net that tries to determine if an image is real or generated. By competing, the generator slowly learns to make better and better &quot;forgeries&quot; of real MNIST digits.</p>
+				<p>This post will walk through creating a Conditional Generative Adversarial Network (CGAN) to generate MNIST digits. The model works by having one neural net that generates an image, and another net that tries to determine if an image is real or generated. By competing, the generator slowly learns to make better and better “forgeries” of real MNIST digits.</p>
 <p style="text-align:center">
 <img src="/imgs/GAN-MNIST.gif"></img>
 </p>
@@ -256,21 +256,21 @@ Image from the <a href="https://arxiv.org/abs/1611.07004">pix2pix paper</a>
     <div class="row">
         <div class="post col">
         	
-				<p>In this post I'm going to walk through Style Transfer using the method described in <a href="https://arxiv.org/pdf/1508.06576v2.pdf">Gatys et al. 2015</a> with the <a href="http://www.robots.ox.ac.uk/~vgg/research/very_deep/">VGG Very-Deep 19</a> model as the source for filter weights.</p>
+				<p>In this post I’m going to walk through Style Transfer using the method described in <a href="https://arxiv.org/pdf/1508.06576v2.pdf">Gatys et al. 2015</a> with the <a href="http://www.robots.ox.ac.uk/~vgg/research/very_deep/">VGG Very-Deep 19</a> model as the source for filter weights.</p>
 <p>We will be taking two images and attemp to transfer the style of one to the other, without losing the content of the recieving image. See the following example (more included at bottom of the post):</p>
 <table>
 <thead>
 <tr class="header">
-<th align="center">Content</th>
-<th align="center">Style</th>
-<th align="center">Output</th>
+<th style="text-align: center;">Content</th>
+<th style="text-align: center;">Style</th>
+<th style="text-align: center;">Output</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><img style='width: 100%' src="/imgs/ipynb/blueno.jpg"></td>
-<td align="center"><img style='width: 100%' src="/imgs/ipynb/starry_night.jpg"></td>
-<td align="center"><img style='width: 100%' src="/imgs/ipynb/out1.png"></td>
+<td style="text-align: center;"><img style='width: 100%' src="/imgs/ipynb/blueno.jpg"></td>
+<td style="text-align: center;"><img style='width: 100%' src="/imgs/ipynb/starry_night.jpg"></td>
+<td style="text-align: center;"><img style='width: 100%' src="/imgs/ipynb/out1.png"></td>
 </tr>
 </tbody>
 </table>

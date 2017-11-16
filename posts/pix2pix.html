@@ -50,7 +50,7 @@
         <div class="post col">
         	
 	        	<p>☀️ <em>This post is a part of my <a href="/posts/summer-of-tensorflow.html">Summer of Tensorflow</a> series</em> ☀️</p>
-<p>One cool application of <a href="/posts/gan-mnist.html">GANs</a> is image translation. The task is given pairs of images, can you learn to generate the output image from an input. Examples of this task would be turning satelite images into maps or coloring black and white photos. In this post we're going to walk through the <a href="https://arxiv.org/abs/1611.07004">pix2pix model by Isola et al.</a></p>
+<p>One cool application of <a href="/posts/gan-mnist.html">GANs</a> is image translation. The task is given pairs of images, can you learn to generate the output image from an input. Examples of this task would be turning satelite images into maps or coloring black and white photos. In this post we’re going to walk through the <a href="https://arxiv.org/abs/1611.07004">pix2pix model by Isola et al.</a></p>
 <figure>
 <img style="width: 70%; display: block; margin:auto;" src="/imgs/ipynb/pix2pix/trans.jpg">
 <figcaption style="text-align:center">
@@ -1167,14 +1167,15 @@ h6:hover .anchor-link {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Leaky-ReLU">Leaky ReLU<a class="anchor-link" href="#Leaky-ReLU">¶</a></h3><p>Leaky ReLU is a variation of normal ReLU that helps prevent dead neurons. With ReLU, values less than 0 are set to 0, and have no gradient. This creates the problem where a neuron can start always outputting 0 for any input and once in that state, can't get out of it since there is no gradient to go up. Leaky ReLU tries to fix this by having values less than zero have a slight negative slope, equivalent to the following:</p>
-\begin{align*}
+<p>\begin{align*}
 \operatorname{ReLU}(x) &= \max(0,x) \\
 \operatorname{LReLU}(x,a) &= \frac{1+a}{2}x + \frac{1-a}{2} \vert x \vert  \\
 &= \begin{cases}
     x,&  x \geq 0\\
     ax,& x < 0
 \end{cases}
-\end{align*}<div style="text-align:center">
+\end{align*}</p>
+<div style="text-align:center">
 <img src="/imgs/ipynb/pix2pix/relu.png" style="margin: 5px; border: 1px solid black; display: inline-block; width: 30%"/><img src="/imgs/ipynb/pix2pix/lrelu.png" style="margin: 5px; border: 1px solid black; display: inline-block; width: 30%"/></div>
 </div>
 </div>

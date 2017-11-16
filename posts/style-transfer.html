@@ -50,21 +50,21 @@
         <div class="post col">
         	
 	        	<p>☀️ <em>This post is a part of my <a href="/posts/summer-of-tensorflow.html">Summer of Tensorflow</a> series</em> ☀️</p>
-<p>In this post I'm going to walk through Style Transfer using the method described in <a href="https://arxiv.org/pdf/1508.06576v2.pdf">Gatys et al. 2015</a> with the <a href="http://www.robots.ox.ac.uk/~vgg/research/very_deep/">VGG Very-Deep 19</a> model as the source for filter weights.</p>
+<p>In this post I’m going to walk through Style Transfer using the method described in <a href="https://arxiv.org/pdf/1508.06576v2.pdf">Gatys et al. 2015</a> with the <a href="http://www.robots.ox.ac.uk/~vgg/research/very_deep/">VGG Very-Deep 19</a> model as the source for filter weights.</p>
 <p>We will be taking two images and attemp to transfer the style of one to the other, without losing the content of the recieving image. See the following example (more included at bottom of the post):</p>
 <table>
 <thead>
 <tr class="header">
-<th align="center">Content</th>
-<th align="center">Style</th>
-<th align="center">Output</th>
+<th style="text-align: center;">Content</th>
+<th style="text-align: center;">Style</th>
+<th style="text-align: center;">Output</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="center"><img style='width: 100%' src="/imgs/ipynb/blueno.jpg"></td>
-<td align="center"><img style='width: 100%' src="/imgs/ipynb/starry_night.jpg"></td>
-<td align="center"><img style='width: 100%' src="/imgs/ipynb/out1.png"></td>
+<td style="text-align: center;"><img style='width: 100%' src="/imgs/ipynb/blueno.jpg"></td>
+<td style="text-align: center;"><img style='width: 100%' src="/imgs/ipynb/starry_night.jpg"></td>
+<td style="text-align: center;"><img style='width: 100%' src="/imgs/ipynb/out1.png"></td>
 </tr>
 </tbody>
 </table>
@@ -1216,22 +1216,27 @@ h6:hover .anchor-link {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Defining-Loss">Defining Loss<a class="anchor-link" href="#Defining-Loss">¶</a></h2><p>This is where the meat of the algorithm lies. Our goal is to create an image that has the style of one image and the content of another, so we should define our loss with this in mind. One way to express this total loss is as a linear combination of the style loss and content loss. We can then play around with the ratio to find a result that balances the two nicely.</p>
-$$\begin{align*}
+<p>$$\begin{align*}
 \vec{p} &= \text{The picture we want the content of} \\
 \vec{a} &= \text{The art we want the style of} \\
 \vec{x} &= \text{The resulting image we generate} \\
 \mathcal{L}_{total}(\vec{p}, \vec{a}, \vec{x}) &= \alpha \mathcal{L}_{content}(\vec{p}, \vec{x}) + \beta \mathcal{L}_{style}(\vec{a}, \vec{x})
-\end{align*}$$<h3 id="Content-Loss">Content Loss<a class="anchor-link" href="#Content-Loss">¶</a></h3><p>The paper defines content loss as follows:</p>
+\end{align*}$$</p>
+<h3 id="Content-Loss">Content Loss<a class="anchor-link" href="#Content-Loss">¶</a></h3><p>The paper defines content loss as follows:</p>
 <p>Let us define $F^l$ as the activation of layer $l$ in response to our generated image $\vec{x}$. $F^l_{ij}$ then represents the activation of the $i$th filter at position $j$ in layer $l$. We can similarly define $P^l_{ij}$, but for the original image rather than our generated one.</p>
 <p>We can then define the loss as the squared error between these values:</p>
-$$ \mathcal{L}_{content}(\vec{p}, \vec{x}, l) = \frac{1}{2} \sum \limits_{i,j} (F^l_{ij} - P^l_{ij})^2 $$<p>where $l$ is the layer we choose to measure the loss on. For the implementation shown in the notebook, <code>conv4_2</code> is chosen.</p>
+<p>$$ \mathcal{L}_{content}(\vec{p}, \vec{x}, l) = \frac{1}{2} \sum \limits_{i,j} (F^l_{ij} - P^l_{ij})^2 $$</p>
+<p>where $l$ is the layer we choose to measure the loss on. For the implementation shown in the notebook, <code>conv4_2</code> is chosen.</p>
 <p>It makes sense that this would be a good measure of content loss; two similar images should activate the CNN similarly. The paper additionally argues for using higher layers of the CNN to measure this loss. Lower layers are very close to the original pixel values, so encode much of the original image (including its style). Higher layers on the other hand are closer to the classification of the image and focus more on structural features, therefore being more a measure of content than style.</p>
 <p>The paper backs up this reasoning by taking images of random noise and trying to train them so as to minimize the content loss. When the content loss is measured on lower layers, the result is almost pixel-perfect to the original image. Higher layers, however, lose some of the pixel content but are still maintain the overall look of the picture. See the figure at the bottom of this cell for illustration.</p>
 <h3 id="Style-Loss">Style Loss<a class="anchor-link" href="#Style-Loss">¶</a></h3><p>Now on to style loss. This was definitely the most confusing part of the algorithm. The paper defines style loss as follows:</p>
 <p>Let us define $F$ the same as we did for content loss. Let us consider $G^l$, the Gram matrix for the set of filters in the layer $l$:</p>
-$$ G^l_{ij} = \sum\limits_k F^l_{ik} F^l_{jk} $$<p>This is esstentially all possible dot products between any two filters of the layer. We then consider $A$ as similarly defined, but for our style image $\vec{a}$ rather than our generated image $\vec{x}$. Let us also define $N_l$ as the number of filters a layer $l$ has and $M_l$ to be the size of each one of these filters. The style loss for a particular layer $l$ is then defined as</p>
-$$ E_l = \frac{1}{4N^2_l M^2_l} \sum\limits_{i,j} (G^l_{ij} - A^l_{ij})^2 $$<p>We then linearly combine the style loss of each layer, each with their own weight $w_l$:</p>
-$$ \mathcal{L}_{style}(\vec{a}, \vec{x}) = \sum\limits_{l=0}^L w_l E_l $$<p>Phew that was confusing. Unlike content loss, I don't have as good of an intuitive understanding of how this works, and based on searches online I'm not alone. Generally, this distance between Gram matrices seems to measure the correlation of features in such a way that isn't spatially dependent and doesn't pick up on a lot of content.</p>
+<p>$$ G^l_{ij} = \sum\limits_k F^l_{ik} F^l_{jk} $$</p>
+<p>This is esstentially all possible dot products between any two filters of the layer. We then consider $A$ as similarly defined, but for our style image $\vec{a}$ rather than our generated image $\vec{x}$. Let us also define $N_l$ as the number of filters a layer $l$ has and $M_l$ to be the size of each one of these filters. The style loss for a particular layer $l$ is then defined as</p>
+<p>$$ E_l = \frac{1}{4N^2_l M^2_l} \sum\limits_{i,j} (G^l_{ij} - A^l_{ij})^2 $$</p>
+<p>We then linearly combine the style loss of each layer, each with their own weight $w_l$:</p>
+<p>$$ \mathcal{L}_{style}(\vec{a}, \vec{x}) = \sum\limits_{l=0}^L w_l E_l $$</p>
+<p>Phew that was confusing. Unlike content loss, I don't have as good of an intuitive understanding of how this works, and based on searches online I'm not alone. Generally, this distance between Gram matrices seems to measure the correlation of features in such a way that isn't spatially dependent and doesn't pick up on a lot of content.</p>
 <p>The paper argues for this measure of style loss with the figure below. It seems if you try to reconstruct an image from noise by minimizing this loss, you get results that show a similar style but don't have features that correspond spatially to the original image. Additionally, as you use higher layers, you get a result that depicts larger and larger scale style.</p>
 <p><img src="/imgs/ipynb/loss_recreation.png" style="width: 100%"/></imgs></p>
 </div>

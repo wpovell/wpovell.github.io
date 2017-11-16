@@ -50,7 +50,7 @@
         <div class="post col">
         	
 	        	<p>☀️ <em>This post is a part of my <a href="/posts/summer-of-tensorflow.html">Summer of Tensorflow</a> series</em> ☀️</p>
-<p>In this post I'm going to walk through implementing a Feed-Forward Neural Net in TensorFlow to classify MNIST digits.</p>
+<p>In this post I’m going to walk through implementing a Feed-Forward Neural Net in TensorFlow to classify MNIST digits.</p>
 <p style="text-align:center">
 <img src="/imgs/ipynb/FF.png" style="width: 500px"></img>
 </p>
@@ -1072,28 +1072,15 @@ $</p>
 </div>
 </div>
 </div>
-<div class="output_wrapper">
-<div class="output">
-<div class="output_area">
-
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>Extracting data/MNIST_data/train-images-idx3-ubyte.gz
-Extracting data/MNIST_data/train-labels-idx1-ubyte.gz
-Extracting data/MNIST_data/t10k-images-idx3-ubyte.gz
-Extracting data/MNIST_data/t10k-labels-idx1-ubyte.gz
-</pre>
-</div>
-</div>
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Hidden-Layer-&-ReLU">Hidden Layer & ReLU<a class="anchor-link" href="#Hidden-Layer-&-ReLU">¶</a></h2><p>Going from the input layer to the hidden layer we have</p>
-$$\underset{(n \times 100)}{\text{H}} = \operatorname{ReLU}(\underset{(n \times 784)}{\text{X}} \times
+<p>$$\underset{(n \times 100)}{\text{H}} = \operatorname{ReLU}(\underset{(n \times 784)}{\text{X}} \times
 \underset{(784 \times 100)}{\text{$W_1$}} +
-\underset{(1 \times 100)}{\text{$B_1$}} )$$<p>Here ReLU (Rectified Linear Unit) is defined as $\operatorname{ReLU}(x) = \max(0,x)$ which is applied to every value. This acts as a non-linear transformation on the values, allowing the model to go beyond making linear predictions. Other functions such as sigmoids are used but ReLU is fast and produces good results.</p>
+\underset{(1 \times 100)}{\text{$B_1$}} )$$</p>
+<p>Here ReLU (Rectified Linear Unit) is defined as $\operatorname{ReLU}(x) = \max(0,x)$ which is applied to every value. This acts as a non-linear transformation on the values, allowing the model to go beyond making linear predictions. Other functions such as sigmoids are used but ReLU is fast and produces good results.</p>
 </div>
 </div>
 </div>
@@ -1117,9 +1104,10 @@ $$\underset{(n \times 100)}{\text{H}} = \operatorname{ReLU}(\underset{(n \times 
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h2 id="Output-Layer-&-Softmax">Output Layer & Softmax<a class="anchor-link" href="#Output-Layer-&-Softmax">¶</a></h2><p>Going from the hidden layer to the output layer we have</p>
-$$ \underset{(n \times 10)}{\text{O}} = \operatorname{Softmax}(\underset{(n \times 100)}{\text{H}} \times
+<p>$$ \underset{(n \times 10)}{\text{O}} = \operatorname{Softmax}(\underset{(n \times 100)}{\text{H}} \times
 \underset{(100 \times 10)}{\text{$W_2$}} +
-\underset{(1 \times 10)}{\text{$B_2$}}) $$<p>Softmax is defined as $$\operatorname{Softmax}(\vec{x})_j = \frac{e^{x_j}}{\sum_{i=1}^{\vert \vec{x} \vert} e^{x_i}}$$</p>
+\underset{(1 \times 10)}{\text{$B_2$}}) $$</p>
+<p>Softmax is defined as $$\operatorname{Softmax}(\vec{x})_j = \frac{e^{x_j}}{\sum_{i=1}^{\vert \vec{x} \vert} e^{x_i}}$$</p>
 <p>Essentially softmax takes a vector of real numbers and turn it into a vector of values between 0 and 1 that sum to 1, forming a valid probability distribution. The loss for the model is then the cross-entropy between the correct label and this probability vector (if you're not familiar with cross-entropy check out <a href="https://rdipietro.github.io/friendly-intro-to-cross-entropy-loss/">this blog post</a>). This causes the model to slowly train towards the maximum probability in the output vector being the correct label. During testing, the maximum probability of the output vector is considered the prediction.</p>
 </div>
 </div>
@@ -1187,30 +1175,19 @@ $$ \underset{(n \times 10)}{\text{O}} = \operatorname{Softmax}(\underset{(n \tim
 <div class="output_area">
 
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>Step 0 Current Training Accuracy: 12.000
-Step 100 Current Training Accuracy: 93.000
-Step 200 Current Training Accuracy: 91.000
-Step 300 Current Training Accuracy: 96.000
-Step 400 Current Training Accuracy: 95.000
-Step 500 Current Training Accuracy: 93.000
+<pre>Step 0 Current Training Accuracy: 9.000
+Step 100 Current Training Accuracy: 87.000
+Step 200 Current Training Accuracy: 89.000
+Step 300 Current Training Accuracy: 94.000
+Step 400 Current Training Accuracy: 92.000
+Step 500 Current Training Accuracy: 94.000
 Step 600 Current Training Accuracy: 96.000
-Step 700 Current Training Accuracy: 97.000
-Step 800 Current Training Accuracy: 97.000
-Step 900 Current Training Accuracy: 98.000
-Test Accuracy: 95.110
+Step 700 Current Training Accuracy: 96.000
+Step 800 Current Training Accuracy: 95.000
+Step 900 Current Training Accuracy: 94.000
+Test Accuracy: 95.450
 </pre>
 </div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="inner_cell">
-<div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
 </div>
 </div>
 </div>

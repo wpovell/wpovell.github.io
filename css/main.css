@@ -94,6 +94,16 @@ th, td {
 	z-index: 100;
 }
 
+@media all and (max-width: 1200px) {
+    #sidebar > h1 {
+	font-size: 3vw;
+    }
+    #sidebar {
+	font-size: 2vw;
+    }
+}
+
+
 .title {
 	font-size: 36px;
 	color: black;
