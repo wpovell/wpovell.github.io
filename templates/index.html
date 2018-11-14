@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% for post in posts %}
+    <p>{{ post.time }} - <a href="{{ post.url }}">{{ post.title }}</a></p>
+  {% endfor %}
+{% endblock %}
