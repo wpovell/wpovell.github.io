@@ -50,8 +50,12 @@ class Post:
     def hide(self):
         return 'hide' in self.meta
 
-    def render(self):
-        body = self.body
+    def render(self, short=False):
+        if short:
+            body = self.body.split("\n\n")[0]
+        else:
+            body = self.body
+
         rendered = toHTML(body, self.file.suffix[1:])
         return rendered
 

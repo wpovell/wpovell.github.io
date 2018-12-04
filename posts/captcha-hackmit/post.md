@@ -10,6 +10,7 @@ time: 2017-07-08
 
 find the solution text. You could request as many images as you'd like, you just had to return 15k solutions with at least 10k correct (~66% accuracy). It was suggested that there was a deterministic way to get the CAPTCHAs from the IDs, however I went with the more straightword ML route.
 
+
 ## Image Processing
 
 Before we do anything serious with machine learning, lets try to clean up the images as much as possible. To start, we can define a cutoff and make everything either black or white.

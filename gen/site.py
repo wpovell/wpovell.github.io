@@ -48,7 +48,7 @@ class Site:
         with open(self.out_dir / 'index.html', 'w') as f:
             f.write(self.render_template('index.html', posts=posts))
 
-    def genTags(self):
+    def genTags(self, posts):
         pass
 
     def copyStatic(self):
