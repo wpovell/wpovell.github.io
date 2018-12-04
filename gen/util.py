@@ -1,4 +1,9 @@
 import pypandoc
 
 def toHTML(text, format='md'):
-    return pypandoc.convert_text(text, 'html', format=format)
+    args = [
+        "--highlight-style=misc/code.theme",
+        "--standalone",
+        "--mathjax",
+    ]
+    return pypandoc.convert_text(text, 'html5', extra_args=args, format=format)

@@ -1,29 +1,30 @@
 from datetime import datetime
-
+import shutil
+from pathlib import Path
+import re
+import yaml
 from gen.util import toHTML
-import gen.ipynb as ipynb
 
 class Post:
-    def __init__(self, file):
+    @staticmethod
+    def from_dir(post):
+        md = list(post.glob("*.md"))
+        if len(md) == 0:
+            return None
+
+        return Post(md[0], post)
+
+
+    def __init__(self, file, root):
         self.file = file
+        self.root = root
         with open(file, encoding='utf-8') as f:
-            lines = list(f)
+            data=f.read()
 
-        addToHeader = True
-        self.body = ''
-        self.meta = {}
-        for line in lines:
-            if addToHeader and line == '\n':
-                addToHeader = False
-            elif addToHeader:
-                tag, value = line.split(':', 1)
-                tag = tag.strip().lower()
-                value = value.strip()
-                self.meta[tag] = value
-            else:
-                self.body += line
-
-        self.processHeaders()
+        header=re.compile(r'---.*---', re.DOTALL)
+        m=header.search(data)
+        self.meta = yaml.load(data[4:m.span()[1]-4])
+        self.body = data[m.span()[1]:]
 
     @property
     def time(self):
@@ -35,7 +36,7 @@ class Post:
 
     @property
     def slug(self):
-        return self.file.stem
+        return self.root.stem
 
     @property
     def tags(self):
@@ -43,29 +44,27 @@ class Post:
 
     @property
     def url(self):
-        return '/posts/' + self.slug + '.html'
+        return '/posts/' + self.slug
 
-    def processHeaders(self):
-        if 'tags' in self.meta:
-            self.meta['tags'] = [x.strip() for x in self.meta['tags'].split(',')]
-        else:
-            self.meta['tags'] = []
-
-        if 'time' in self.meta:
-            self.meta['time'] = datetime.strptime(self.meta['time'], '%y-%m-%d')
-
-        self.hide = 'hide' in self.meta
+    @property
+    def hide(self):
+        return 'hide' in self.meta
 
     def render(self):
         body = self.body
         rendered = toHTML(body, self.file.suffix[1:])
-        if 'ipython' in self.meta:
-            content, info = ipynb.get_html_from_filepath(self.meta['ipython'])
-            content = ipynb.fix_css(content, info)
-            content = content.replace('imgs/', '/imgs/')
-            rendered += content
-
         return rendered
+
+    def create(self, out, render):
+        out = out / self.slug
+
+        if out.exists():
+            shutil.rmtree(str(out))
+
+        shutil.copytree(str(self.root), str(out))
+
+        with open(out / 'index.html', 'w') as f:
+            f.write(render('post.html', post=self))
 
     def __str__(self):
         return self.render()

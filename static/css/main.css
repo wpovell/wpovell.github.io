@@ -1,18 +1,126 @@
-body {
-  width: 100%;
+/* Theme */
+
+:root {
+  --bg: #e6f0f3;
+  --fg: #1c2627;
+  --off: #cfdadd;
+  --highlight: #1f7a96;
+}
+
+/* Resets */
+
+html, body {
   margin: 0;
   padding: 0;
-  background-color: #f8f4e3;
-  color: #595959;
-  font-family: 'Source Sans Pro', sans-serif;
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg);
+  color: var(--fg);
+  font-family: monospace;
 }
 
-#wrapper {
-  max-width: 700px;
-  margin: 100px auto;
+/* Layout */
+
+header, main, footer {
+  flex-shrink: 0;
 }
+
+main {
+  margin: 0 25%;
+  font-size: 1.4em;
+  flex-grow: 1;
+  line-height: 1.5em;
+}
+
+p {
+  line-height: 1.7em;
+}
+
+@media only screen and (max-width: 1000px) {
+  main {
+      margin: 0 10%;
+  }
+}
+
+article {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* Links */
 
 a {
+  color: var(--highlight);
   text-decoration: none;
-  color: inherit;
+}
+
+a:hover {
+  border-bottom: solid 1px;
+}
+
+/* Header */
+
+header {
+  border-bottom: solid;
+  display: flex;
+  justify-content: space-between;
+  padding: 1vh;
+}
+
+header > h1 {
+  margin: 0;
+  font-size: 3em;
+  font-weight: bold;
+}
+
+/* Override normal link styling */
+header a, header a:hover {
+  color: var(--fg);
+}
+
+header > h1 a, header > h1 a:hover {
+  border: none;
+}
+
+header > ul {
+  justify-self: right;
+  list-style: none;
+  margin: 0;
+  font-size: 2em;
+
+  /* This is a hack because I couldn't figure out how to align with the h1 */
+  margin-top: 0.8vh;
+}
+
+@media only screen and (max-width: 1000px) {
+  header > ul {
+      font-size: 1.1em;
+      margin-top: 3vh;
+  }
+}
+
+header > ul > li {
+  display: inline-block;
+  padding: 0 2vh;
+}
+
+/* Footer */
+
+footer {
+  padding: 1vh;
+  text-align: center;
+}
+
+/* Code */
+
+p > code {
+  background-color: white;
+  padding: 3px;
+}
+
+pre, div.sourceCode {
+  background-color: white;
+  padding: 20px;
 }
