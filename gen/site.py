@@ -20,17 +20,17 @@ class Site:
             autoescape=select_autoescape(['html'])
         )
 
-    def initDist(self):
+    def init_dist(self):
         if self.deploy:
             shutil.rmtree(self.out_dir)
-        Path.mkdir(self.out_dir / 'posts', parents=True, exist_ok=True)
+        Path.mkdir(self.out_dir / 'blog', parents=True, exist_ok=True)
 
 
     def render_template(self, fn, **kwargs):
         kwargs['updated'] = self.time
         return self.env.get_template(fn).render(kwargs)
 
-    def genPosts(self):
+    def gen_posts(self):
         posts = []
         for p in self.posts_dir.iterdir():
             post = Post.from_dir(p)
@@ -38,25 +38,30 @@ class Site:
             if post is None or (self.deploy and post.hide):
                 continue
 
-            post.create(self.out_dir / 'posts', self.render_template)
+            post.create(self.out_dir / 'blog', self.render_template)
             posts.append(post)
 
         posts.sort(key=lambda p: p.meta['time'], reverse=True)
         return posts
 
-    def genIndex(self, posts):
-        with open(self.out_dir / 'index.html', 'w') as f:
+    def gen_index(self, posts):
+        with open(self.out_dir / 'blog' / 'index.html', 'w') as f:
             f.write(self.render_template('index.html', posts=posts))
 
-    def genTags(self, posts):
+    def gen_tags(self, posts):
         pass
 
-    def copyStatic(self):
+    def gen_landing(self):
+        with open(self.out_dir / 'index.html', 'w') as f:
+            f.write(self.render_template('landing.html'))
+
+    def copy_static(self):
         dir_util.copy_tree(str(self.static_dir), str(self.out_dir))
 
     def render(self):
-        self.initDist()
-        posts = self.genPosts()
-        self.genIndex(posts)
-        self.genTags()
-        self.copyStatic()
+        self.init_dist()
+        posts = self.gen_posts()
+        self.gen_landing()
+        self.gen_index(posts)
+        self.gen_tags(posts)
+        self.copy_static()

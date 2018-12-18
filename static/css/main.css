@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans');
+
 /* Theme */
 
 :root {
@@ -16,7 +18,7 @@ html, body {
   height: 100%;
   background-color: var(--bg);
   color: var(--fg);
-  font-family: monospace;
+  font-family: 'Open Sans', sans-serif;
 }
 
 /* Layout */
@@ -27,7 +29,7 @@ header, main, footer {
 
 main {
   margin: 0 25%;
-  font-size: 1.4em;
+  font-size: 1.2em;
   flex-grow: 1;
   line-height: 1.5em;
 }
@@ -71,7 +73,7 @@ header {
 
 header > h1 {
   margin: 0;
-  font-size: 3em;
+  font-size: 2.5em;
   font-weight: bold;
 }
 
@@ -82,28 +84,6 @@ header a, header a:hover {
 
 header > h1 a, header > h1 a:hover {
   border: none;
-}
-
-header > ul {
-  justify-self: right;
-  list-style: none;
-  margin: 0;
-  font-size: 2em;
-
-  /* This is a hack because I couldn't figure out how to align with the h1 */
-  margin-top: 0.8vh;
-}
-
-@media only screen and (max-width: 1000px) {
-  header > ul {
-      font-size: 1.1em;
-      margin-top: 3vh;
-  }
-}
-
-header > ul > li {
-  display: inline-block;
-  padding: 0 2vh;
 }
 
 /* Footer */

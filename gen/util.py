@@ -1,6 +1,6 @@
 import pypandoc
 
-def toHTML(text, format='md'):
+def to_HTML(text, format='md'):
     args = [
         "--highlight-style=misc/code.theme",
         "--standalone",

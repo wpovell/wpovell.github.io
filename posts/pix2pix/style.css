@@ -1,0 +1,12 @@
+.deconv img {
+    height: 400px;
+}
+
+.pad {
+    padding: 1em;
+}
+
+.deconv > p:last-child {
+    text-align: center;
+    display: inherit;
+}

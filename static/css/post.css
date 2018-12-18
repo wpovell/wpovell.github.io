@@ -1,0 +1,32 @@
+p > img, figure > img {
+    margin: auto;
+    width: 30vw;
+    display: block
+}
+
+.center {
+    display: flex;
+    justify-content: center;
+}
+
+figure {
+    display: flex;
+    flex-direction: column;
+}
+
+figcaption {
+    align-self: center;
+}
+
+@media only screen and (max-width: 1000px) {
+    p > img {
+        width: 60vw;
+    }
+}
+
+@media only screen and (min-width: 1000px) {
+    div.flex > p {
+        display: flex;
+        justify-content: space-between;
+    }
+}

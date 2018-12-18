@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 import re
 import yaml
-from gen.util import toHTML
+from gen.util import to_HTML
 
 class Post:
     @staticmethod
@@ -18,10 +18,11 @@ class Post:
     def __init__(self, file, root):
         self.file = file
         self.root = root
+        self.css = list(map(lambda p: p.name, root.glob("*.css")))
         with open(file, encoding='utf-8') as f:
             data=f.read()
 
-        header=re.compile(r'---.*---', re.DOTALL)
+        header=re.compile(r'^---.*^---\n', re.DOTALL|re.MULTILINE)
         m=header.search(data)
         self.meta = yaml.load(data[4:m.span()[1]-4])
         self.body = data[m.span()[1]:]
@@ -44,7 +45,7 @@ class Post:
 
     @property
     def url(self):
-        return '/posts/' + self.slug
+        return '/blog/' + self.slug
 
     @property
     def hide(self):
@@ -56,7 +57,7 @@ class Post:
         else:
             body = self.body
 
-        rendered = toHTML(body, self.file.suffix[1:])
+        rendered = to_HTML(body, self.file.suffix[1:])
         return rendered
 
     def create(self, out, render):
@@ -68,7 +69,7 @@ class Post:
         shutil.copytree(str(self.root), str(out))
 
         with open(out / 'index.html', 'w') as f:
-            f.write(render('post.html', post=self))
+            f.write(render('post.html', post=self, css=self.css))
 
     def __str__(self):
         return self.render()

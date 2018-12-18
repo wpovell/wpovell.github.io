@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% block style %}
+	<link rel="stylesheet" type="text/css" media="screen" href="/css/post.css" />
+	{% for file in css %}
+		<link rel="stylesheet" type="text/css" media="screen" href="{{ file }}" />
+	{% endfor %}
+{% endblock %}
+
 {% block content %}
 	<h1>{{ post.title }}</h1>
 	<div>
